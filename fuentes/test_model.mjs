@@ -1,0 +1,16 @@
+import * as THREE from 'three';
+import fs from 'fs';
+import vm from 'vm';
+globalThis.THREE = THREE;
+vm.runInThisContext(fs.readFileSync('src/model.js','utf8'));
+const t0=Date.now();
+const M = globalThis.ResonadorModel.build();
+console.log('build ms', Date.now()-t0, 'units', M.units.length);
+let meshes=0, tris=0;
+M.root.traverse(o=>{ if(o.isMesh){meshes++; const g=o.geometry; tris += (g.index? g.index.count: g.attributes.position.count)/3; if(g.attributes.position.array.some(v=>Number.isNaN(v))) console.log('NaN in', o.parent.name);} });
+console.log('meshes',meshes,'tris',Math.round(tris));
+const box=new THREE.Box3().setFromObject(M.root);
+console.log('bbox', box.min.toArray().map(v=>v.toFixed(2)), box.max.toArray().map(v=>v.toFixed(2)));
+const b2=new THREE.Box3(); M.units.forEach(u=>{ if(u.name!=='Cable_Principal' && !u.name.startsWith('Cable_Control')) b2.expandByObject(u);});
+console.log('sin cables', b2.min.toArray().map(v=>v.toFixed(2)), b2.max.toArray().map(v=>v.toFixed(2)));
+M.units.forEach(u=>{ const d=u.userData; if(d.cy===undefined||d.h===undefined) console.log('falta cy/h', d.id); });
