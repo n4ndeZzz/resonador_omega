@@ -5,7 +5,7 @@ Visor interactivo del **Resonador Ω** (Proyecto Ω · Instituto Kurchátov, uni
 Un solo modelo 3D muestra las cinco herramientas infográficas: **despiece, explosión, corte, transparencia y acercamiento** (más la vista general).
 
 ## Ver el visor
-Con GitHub Pages activo: `[ABRE EL LINK](https://n4ndezzz.github.io/resonador_omega/)`
+Con GitHub Pages activo: `https://n4ndezzz.github.io/resonador_omega/`
 
 Controles: arrastrar para rotar · rueda para acercar · teclas **1–6** para cambiar de estado · clic en una pieza para leerla · botón *Componentes* para ocultar o mostrar piezas.
 
