@@ -1,0 +1,164 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}
+.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:720px}
+#chart{width:100%;height:auto;display:block}
+.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.btn{padding:7px 18px;border:0.5px solid var(--border-strong);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--surface-2);color:var(--text-primary);transition:background .12s,transform .12s,box-shadow .12s}
+.btn:hover:not(:disabled){background:var(--surface-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn-primary{background:#1d3f7a;color:#fff;border-color:#1d3f7a}
+.btn-primary:hover:not(:disabled){background:#254d96}
+.pbar{height:2px;background:var(--border);border-radius:99px;margin-top:12px;overflow:hidden}
+.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#0d2240,#b8e9f5);border-radius:99px}
+</style>
+
+<div class="card">
+  <svg id="chart" viewBox="0 0 720 510" xmlns="http://www.w3.org/2000/svg"
+    role="img" aria-label="Poder en economía global de Aerhyn 2082 — gráfica de dona con cinco sectores"></svg>
+  <div class="controls">
+    <button class="btn btn-primary" id="btnPlay">▶ Reproducir</button>
+    <button class="btn" id="btnPause" disabled>⏸ Pausar</button>
+    <button class="btn" id="btnReset" disabled>↺ Reiniciar</button>
+  </div>
+  <div class="pbar"><div class="pbar-fill" id="pFill"></div></div>
+</div>
+
+<script>
+const DONUT=[
+  {label:'Tecnología fluídica',    val:24, col:'#b8e9f5', tc:'#1d3f7a'},
+  {label:'Energía',                val:19, col:'#3ab4d8', tc:'#fff'},
+  {label:'Biotecnología',          val:17, col:'#1d3557', tc:'#fff'},
+  {label:'Agricultura adaptativa', val:14, col:'#5bc8e0', tc:'#1d3557'},
+  {label:'Otros',                  val:26, col:'#0d2240', tc:'#fff'},
+];
+let cum=0;
+DONUT.forEach(d=>{d.sa=cum*3.6;d.sw=d.val*3.6;d.ea=d.sa+d.sw;d.ma=d.sa+d.sw/2;cum+=d.val;});
+
+const CX=360,CY=295,RO=158,RI=72,RM=(RO+RI)/2;
+const VW=720,VH=510;
+const ff="'Segoe UI',-apple-system,sans-serif";
+const dk=()=>document.documentElement.dataset.mode==='dark'||(!document.documentElement.dataset.mode&&matchMedia('(prefers-color-scheme:dark)').matches);
+const txc =()=>dk()?'#f0efec':'#111';
+const txc2=()=>dk()?'#c3c2b7':'#555';
+
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};
+const mkt=(s,a,p)=>{const e=mk('text',a,p);e.textContent=String(s);return e;};
+
+function pxy(ang,r){
+  const rad=(ang-90)*Math.PI/180;
+  return[+(CX+r*Math.cos(rad)).toFixed(2),+(CY+r*Math.sin(rad)).toFixed(2)];
+}
+
+function donutPath(sa,ea){
+  const sw=ea-sa;
+  if(sw<=0.02)return'M0,0';
+  const lg=sw>180?1:0;
+  const[osx,osy]=pxy(sa,RO),[oex,oey]=pxy(ea,RO);
+  const[iex,iey]=pxy(ea,RI),[isx,isy]=pxy(sa,RI);
+  return`M${osx},${osy}A${RO},${RO},0,${lg},1,${oex},${oey}L${iex},${iey}A${RI},${RI},0,${lg},0,${isx},${isy}Z`;
+}
+
+const svg=document.getElementById('chart');
+mk('rect',{x:0,y:0,width:VW,height:VH,fill:'transparent'},svg);
+
+// Title
+const titleEl=mkt('Poder en economía global de Aerhyn 2082',{
+  x:16,y:30,'font-size':19.5,'font-weight':700,
+  fill:txc(),opacity:0,'font-family':ff,'letter-spacing':'-0.3'
+},svg);
+
+// Legend — 1 row
+const lgG=mk('g',{opacity:0},svg);
+const LGX=[16,147,212,310,458];
+DONUT.forEach((d,i)=>{
+  mk('rect',{x:LGX[i],y:50,width:12,height:12,fill:d.col,rx:2},lgG);
+  mkt(d.label,{x:LGX[i]+17,y:59.5,'font-size':9.5,fill:txc2(),'font-family':ff},lgG);
+});
+
+// Donut segments + labels
+const segs=[];
+DONUT.forEach((d,i)=>{
+  const path=mk('path',{fill:d.col,stroke:'#fff','stroke-width':1.8},svg);
+  path.setAttribute('d','M0,0');
+
+  const[lx,ly]=pxy(d.ma,RM);
+  const lg=mk('g',{opacity:0},svg);
+
+  if(d.label==='Agricultura adaptativa'){
+    // 3-line label for narrow segment
+    const txEl=mk('text',{x:lx,y:ly-13,'text-anchor':'middle','font-family':ff},lg);
+    const sp1=mk('tspan',{x:lx,dy:0,'font-size':9,'font-weight':700,fill:d.tc},txEl); sp1.textContent='Agricultura';
+    const sp2=mk('tspan',{x:lx,dy:11,'font-size':9,'font-weight':700,fill:d.tc},txEl); sp2.textContent='adaptativa';
+    const sp3=mk('tspan',{x:lx,dy:14,'font-size':12,'font-weight':700,fill:d.tc},txEl); sp3.textContent=d.val;
+  } else {
+    mkt(d.label,{x:lx,y:ly-8,'text-anchor':'middle','font-size':10.5,'font-weight':700,fill:d.tc,'font-family':ff},lg);
+    mkt(d.val,{x:lx,y:ly+8,'text-anchor':'middle','font-size':13,'font-weight':700,fill:d.tc,'font-family':ff},lg);
+  }
+
+  segs.push({path,lg});
+});
+
+// Credit
+mkt('Creado con Datawrapper',{x:16,y:500,'font-size':10,fill:dk()?'#555':'#bbb','font-family':ff},svg);
+
+// Easing
+const eExp  =t=>t>=1?1:1-Math.pow(2,-10*t);
+const eCubic=t=>1-Math.pow(1-t,3);
+const clamp =(v,a=0,b=1)=>Math.min(Math.max(v,a),b);
+const pt    =(e,s,d)=>clamp((e-s)/d);
+
+DONUT.forEach(d=>{d.dur=350+(d.sw/360)*720;});
+const T0=380,STG=265;
+const TOTAL=T0+(DONUT.length-1)*STG+DONUT[DONUT.length-1].dur+350;
+
+function update(e){
+  titleEl.setAttribute('opacity',eCubic(pt(e,0,320)));
+  lgG.setAttribute('opacity',    eCubic(pt(e,120,300)));
+
+  DONUT.forEach((d,i)=>{
+    const tt=eExp(pt(e,T0+i*STG,d.dur));
+    const ce=d.sa+d.sw*tt;
+    segs[i].path.setAttribute('d',donutPath(d.sa,ce));
+    segs[i].lg.setAttribute('opacity',eCubic(clamp((tt-0.72)/0.28)));
+  });
+  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';
+}
+
+// State machine
+let segStart=null,acc=0,state='idle',raf=null;
+const btnPlay=document.getElementById('btnPlay');
+const btnPause=document.getElementById('btnPause');
+const btnReset=document.getElementById('btnReset');
+
+function sync(){
+  btnPause.disabled=state!=='playing';
+  btnReset.disabled=state==='idle';
+  btnPlay.disabled=state==='playing';
+  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';
+}
+function play(){
+  segStart=performance.now();state='playing';sync();
+  (function loop(){
+    if(state!=='playing')return;
+    const e=acc+(performance.now()-segStart);
+    update(e);
+    if(e>=TOTAL){update(TOTAL);state='done';sync();}
+    else raf=requestAnimationFrame(loop);
+  })();
+}
+function pause(){cancelAnimationFrame(raf);acc+=performance.now()-segStart;segStart=null;state='paused';sync();}
+function reset(){
+  cancelAnimationFrame(raf);acc=0;segStart=null;state='idle';
+  titleEl.setAttribute('opacity',0);lgG.setAttribute('opacity',0);
+  segs.forEach(s=>{s.path.setAttribute('d','M0,0');s.lg.setAttribute('opacity',0);});
+  document.getElementById('pFill').style.width='0%';sync();
+}
+btnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});
+btnPause.addEventListener('click',pause);
+btnReset.addEventListener('click',reset);
+sync();
+</script>

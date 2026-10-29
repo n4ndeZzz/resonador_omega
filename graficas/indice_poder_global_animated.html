@@ -1,0 +1,191 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}
+.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:720px}
+#chart{width:100%;height:auto;display:block}
+.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.btn{padding:7px 18px;border:0.5px solid var(--border-strong);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--surface-2);color:var(--text-primary);transition:background .12s,transform .12s,box-shadow .12s}
+.btn:hover:not(:disabled){background:var(--surface-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn-primary{background:#1d3557;color:#fff;border-color:#1d3557}
+.btn-primary:hover:not(:disabled){background:#253f6a}
+.pbar{height:2px;background:var(--border);border-radius:99px;margin-top:12px;overflow:hidden}
+.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#1d3557,#48cae4);border-radius:99px}
+</style>
+
+<div class="card">
+  <svg id="chart" viewBox="0 0 720 490" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Índice de poder global — comparación IPG 1986 vs 2082 para 6 bloques geopolíticos"></svg>
+  <div class="controls">
+    <button class="btn btn-primary" id="btnPlay">▶ Reproducir</button>
+    <button class="btn" id="btnPause" disabled>⏸ Pausar</button>
+    <button class="btn" id="btnReset" disabled>↺ Reiniciar</button>
+  </div>
+  <div class="pbar"><div class="pbar-fill" id="pFill"></div></div>
+</div>
+
+<script>
+const DATA=[
+  {label:'Federación Atlántica',   v86:100,v82:68},
+  {label:'Federación Euroasiática',v86:82, v82:41},
+  {label:'Confederación Europea',  v86:76, v82:73},
+  {label:'Japón',                  v86:72, v82:38},
+  {label:'Unión Sino-Pacífica',    v86:34, v82:92},
+  {label:'Liga Andina',            v86:18, v82:47},
+];
+
+const VW=720,VH=490;
+const pL=214,pR=48,pT=82,pB=24;
+const cW=VW-pL-pR,cH=VH-pT-pB;
+const N=DATA.length,GH=cH/N;
+const BH=21,BG=8;
+const OH=(GH-BH*2-BG)*0.5;
+const XS=cW/100;
+const C86='#1d3557',C82='#48cae4';
+const isDark=()=>document.documentElement.dataset.mode==='dark'||(!document.documentElement.dataset.mode&&matchMedia('(prefers-color-scheme:dark)').matches);
+
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};
+const mkt=(s,a,p)=>{const e=mk('text',a,p);e.textContent=String(s);return e;};
+const ff="'Segoe UI',-apple-system,sans-serif";
+
+const svg=document.getElementById('chart');
+mk('rect',{x:0,y:0,width:VW,height:VH,fill:'transparent'},svg);
+const root=mk('g',{transform:`translate(${pL},${pT})`},svg);
+
+// Title
+const titleEl=mkt('índice de poder global',{
+  x:-pL,y:-pT+26,'font-size':21,'font-weight':700,
+  fill:isDark()?'#f0efec':'#111111',opacity:0,'font-family':ff,'letter-spacing':'-0.3'
+},root);
+
+// Legend
+const lgG=mk('g',{opacity:0},root);
+const LY=-pT+50;
+[[0,C86,'IPG_1986'],[108,C82,'IPG_2082']].forEach(([dx,col,lbl])=>{
+  mk('rect',{x:-pL+dx,y:LY,width:13,height:13,fill:col,rx:2.5},lgG);
+  mkt(lbl,{x:-pL+dx+19,y:LY+10.5,'font-size':11.5,fill:isDark()?'#c3c2b7':'#555','font-family':ff},lgG);
+});
+
+// Subtle gridlines
+const gridG=mk('g',{opacity:0},root);
+[0,25,50,75,100].forEach(v=>{
+  const x=v*XS;
+  mk('line',{x1:x,y1:0,x2:x,y2:cH,stroke:isDark()?'#2c2c2a':'#ebebeb','stroke-width':1},gridG);
+  mkt(v,{x,y:-8,'text-anchor':'middle','font-size':10,fill:isDark()?'#898781':'#aaa','font-family':ff},gridG);
+});
+mk('line',{x1:0,y1:0,x2:0,y2:cH,stroke:isDark()?'#383835':'#ccc','stroke-width':1},gridG);
+
+// Layers
+const barsG=mk('g',{},root);
+const labG=mk('g',{},root);
+const vlabG=mk('g',{},root);
+
+const bars=[];
+DATA.forEach((d,gi)=>{
+  const gy=gi*GH+OH;
+  const lbl=mkt(d.label,{
+    x:-12,y:gy+BH+BG/2,
+    'text-anchor':'end','dominant-baseline':'middle',
+    'font-size':12.2,fill:isDark()?'#f0efec':'#222',opacity:0,'font-family':ff
+  },labG);
+  function addBar(val,col,yOff){
+    const tw=val*XS;
+    const r=mk('rect',{x:0,y:gy+yOff,width:0,height:BH,fill:col,rx:2},barsG);
+    const vl=mkt(val,{
+      x:5,y:gy+yOff+BH/2,'dominant-baseline':'central',
+      'font-size':11,'font-weight':700,fill:'#fff',opacity:0,'font-family':ff
+    },vlabG);
+    bars.push({r,vl,lbl,tw});
+  }
+  addBar(d.v86,C86,0);
+  addBar(d.v82,C82,BH+BG);
+});
+
+mkt('Creado con Datawrapper',{
+  x:-pL,y:cH+16,'font-size':10,fill:isDark()?'#555':'#ccc','font-family':ff
+},root);
+
+// Easing
+const eExp  =t=>t>=1?1:1-Math.pow(2,-10*t);
+const eCubic=t=>1-Math.pow(1-t,3);
+const clamp =(v,a=0,b=1)=>Math.min(Math.max(v,a),b);
+const pt    =(e,s,d)=>clamp((e-s)/d);
+
+// Timing
+const STAGGER=280,BAR_DUR=960,BAR_OFF=90,T0=390;
+const TOTAL=T0+(N-1)*STAGGER+BAR_OFF+BAR_DUR+320;
+
+function update(e){
+  titleEl.setAttribute('opacity',eCubic(pt(e,0,300)));
+  lgG.setAttribute('opacity',    eCubic(pt(e,130,320)));
+  gridG.setAttribute('opacity',  eCubic(pt(e,200,350)));
+
+  for(let gi=0;gi<N;gi++){
+    const gs=T0+gi*STAGGER;
+    const b0=bars[gi*2],b1=bars[gi*2+1];
+
+    // Label appears just before its bars
+    b0.lbl.setAttribute('opacity',eCubic(pt(e,gs-90,230)));
+
+    // Dark bar (IPG_1986)
+    const t0=eExp(pt(e,gs,BAR_DUR));
+    const w0=b0.tw*t0;
+    b0.r.setAttribute('width',w0);
+    b0.vl.setAttribute('opacity',eCubic(clamp((w0-24)/18)));
+
+    // Cyan bar (IPG_2082) — slight delay
+    const t1=eExp(pt(e,gs+BAR_OFF,BAR_DUR));
+    const w1=b1.tw*t1;
+    b1.r.setAttribute('width',w1);
+    b1.vl.setAttribute('opacity',eCubic(clamp((w1-24)/18)));
+  }
+  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';
+}
+
+// State machine
+let segStart=null,acc=0,state='idle',raf=null;
+const btnPlay =document.getElementById('btnPlay');
+const btnPause=document.getElementById('btnPause');
+const btnReset=document.getElementById('btnReset');
+
+function sync(){
+  btnPause.disabled=state!=='playing';
+  btnReset.disabled=state==='idle';
+  btnPlay.disabled =state==='playing';
+  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';
+}
+
+function play(){
+  segStart=performance.now(); state='playing'; sync();
+  (function loop(){
+    if(state!=='playing')return;
+    const e=acc+(performance.now()-segStart);
+    update(e);
+    if(e>=TOTAL){update(TOTAL);state='done';sync();}
+    else raf=requestAnimationFrame(loop);
+  })();
+}
+
+function pause(){
+  cancelAnimationFrame(raf);
+  acc+=performance.now()-segStart;
+  segStart=null; state='paused'; sync();
+}
+
+function reset(){
+  cancelAnimationFrame(raf); acc=0; segStart=null; state='idle';
+  titleEl.setAttribute('opacity',0);
+  lgG.setAttribute('opacity',0);
+  gridG.setAttribute('opacity',0);
+  bars.forEach(b=>{b.r.setAttribute('width',0);b.vl.setAttribute('opacity',0);b.lbl.setAttribute('opacity',0);});
+  document.getElementById('pFill').style.width='0%';
+  sync();
+}
+
+btnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});
+btnPause.addEventListener('click',pause);
+btnReset.addEventListener('click',reset);
+sync();
+</script>

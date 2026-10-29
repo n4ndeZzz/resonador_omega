@@ -1,0 +1,175 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}
+.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:720px}
+#chart{width:100%;height:auto;display:block}
+.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.btn{padding:7px 18px;border:0.5px solid var(--border-strong);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--surface-2);color:var(--text-primary);transition:background .12s,transform .12s,box-shadow .12s}
+.btn:hover:not(:disabled){background:var(--surface-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn-primary{background:#1d3f7a;color:#fff;border-color:#1d3f7a}
+.btn-primary:hover:not(:disabled){background:#254d96}
+.pbar{height:2px;background:var(--border);border-radius:99px;margin-top:12px;overflow:hidden}
+.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#b8e9f5,#0d2240);border-radius:99px}
+</style>
+
+<div class="card">
+  <svg id="chart" viewBox="0 0 720 440" xmlns="http://www.w3.org/2000/svg"
+    role="img" aria-label="Concentración HAE por sector — mapa mundial autocontenido"></svg>
+  <div class="controls">
+    <button class="btn btn-primary" id="btnPlay">▶ Reproducir</button>
+    <button class="btn" id="btnPause" disabled>⏸ Pausar</button>
+    <button class="btn" id="btnReset" disabled>↺ Reiniciar</button>
+  </div>
+  <div class="pbar"><div class="pbar-fill" id="pFill"></div></div>
+</div>
+
+<script>
+// ══ MAPA AUTOCONTENIDO — sin D3, sin fetch, sin CDN ══════════
+// Proyección: Equirectangular (Plate Carrée)
+// Área del mapa: x 0..720, y 50..440 (390 px de alto)
+
+const VW=720,VH=440;
+const ff="'Segoe UI',-apple-system,sans-serif";
+const ISD=document.documentElement.dataset.mode==='dark'||
+  (!document.documentElement.dataset.mode&&matchMedia('(prefers-color-scheme:dark)').matches);
+const TC =ISD?'#f0efec':'#111';
+const TC2=ISD?'#898781':'#999';
+
+// Proyección: (lng,lat) → (x,y) SVG
+const p2s=(lng,lat)=>[+(720*(lng+180)/360).toFixed(1),+(50+390*(90-lat)/180).toFixed(1)];
+
+// ── BURBUJAS (orden oeste → este) ─────────────────────────────
+const BUBBLES=[
+  {lat:5,  lng:-155,val:49},
+  {lat:12, lng:-65, val:27},
+  {lat:-20,lng:-52, val:12},
+  {lat:50, lng:3,   val:34},
+  {lat:4,  lng:23,  val:44},
+  {lat:48, lng:68,  val:13},
+  {lat:22, lng:78,  val:51},
+  {lat:-27,lng:133, val:18},
+];
+const colorFn=v=>{const t=(v-12)/39;return`rgb(${Math.round(184-171*t)},${Math.round(233-199*t)},${Math.round(245-181*t)})`;};
+const rFn=v=>10+(v-12)/39*24;
+
+// ── POLÍGONOS DE CONTINENTES (pre-calculados, equirectangular) ─
+const POLYS=[
+  // América del Norte
+  "24,104 80,89 190,87 240,65 256,115 250,141 240,150 220,156 208,172 200,193 184,210 176,210 166,200 140,195 126,178 112,140 90,124 80,115",
+  // América del Sur
+  "204,223 240,219 260,241 288,256 284,275 276,295 270,301 264,306 254,317 246,327 228,366 216,353 208,340 200,319 200,267",
+  // Europa
+  "340,167 350,167 360,152 366,137 364,135 372,128 380,126 390,122 396,115 410,104 416,93 400,93 390,93 380,109 370,119 360,135 354,137 350,141 344,152",
+  // África
+  "326,210 360,223 390,234 400,321 430,299 444,271 460,219 450,213 440,202 424,176 410,176 380,163 350,169 340,176 330,184 326,202",
+  // Asia (incluyendo subcontinente indio y SE asiático)
+  "420,163 430,165 450,158 460,148 480,163 510,169 520,176 540,197 560,206 570,219 580,234 600,256 620,262 630,256 640,245 670,223 690,115 696,104 670,89 560,89 520,87 460,93 440,89 420,98 410,115 416,126",
+  // Australia
+  "588,293 596,288 620,271 634,278 650,284 660,293 668,299 666,310 666,327 654,332 648,327 636,319 620,317 604,319 588,310 584,299",
+  // Groenlandia
+  "256,115 270,104 300,93 320,87 310,78 290,72 270,67 244,65 230,76 224,89 236,104",
+  // Japón
+  "620,178 626,171 630,167 640,158 642,156 642,152 640,150 636,152 630,163 626,169",
+  // Reino Unido (aproximado)
+  "354,137 360,135 364,132 360,127 350,124 344,131 350,137"
+];
+
+// ── SVG ───────────────────────────────────────────────────────
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};
+const mkt=(s,a,p)=>{const e=mk('text',a,p);e.textContent=String(s);return e;};
+
+const svg=document.getElementById('chart');
+
+// Fondo oceánico
+mk('rect',{x:0,y:0,width:VW,height:VH,fill:ISD?'#0d1520':'#c8e8f4'},svg);
+
+// Continentes
+const ctF=ISD?'#3a3a38':'#d0d0cc', ctB=ISD?'#222':'#fff';
+POLYS.forEach(pts=>mk('polygon',{points:pts,fill:ctF,stroke:ctB,'stroke-width':0.5},svg));
+
+// Ecuador (línea de referencia punteada)
+mk('line',{x1:0,y1:245,x2:720,y2:245,stroke:ISD?'#1e2535':'#aad4e8','stroke-width':0.5,'stroke-dasharray':'4,4'},svg);
+
+// Título
+const titleEl=mkt('Concentración HAE por sector',{
+  x:15,y:22,'font-size':20,'font-weight':700,fill:TC,opacity:0,'font-family':ff,'letter-spacing':'-0.3'
+},svg);
+
+// Leyenda de escala
+const defs=mk('defs',{},svg);
+const grad=mk('linearGradient',{id:'hG',x1:'0%',y1:'0%',x2:'100%',y2:'0%'},defs);
+mk('stop',{'offset':'0%','stop-color':colorFn(12)},grad);
+mk('stop',{'offset':'100%','stop-color':colorFn(51)},grad);
+
+const lgG=mk('g',{opacity:0},svg);
+mkt('%VOL/VOL',{x:16,y:VH-50,'font-size':9,fill:TC2,'font-family':ff},lgG);
+mk('rect',{x:16,y:VH-42,width:110,height:8,fill:'url(#hG)',rx:2},lgG);
+mkt('12%',{x:16,y:VH-27,'font-size':9,fill:TC2,'font-family':ff},lgG);
+mkt('51%',{x:126,y:VH-27,'font-size':9,'text-anchor':'end',fill:TC2,'font-family':ff},lgG);
+mkt('Creado con Datawrapper',{x:VW-16,y:VH-10,'text-anchor':'end','font-size':10,fill:TC2,'font-family':ff},svg);
+
+// Burbujas
+const bubblesG=mk('g',{},svg);
+BUBBLES.forEach(b=>{
+  const[cx,cy]=p2s(b.lng,b.lat);
+  b.cx=cx;b.cy=cy;b.maxR=rFn(b.val);b.col=colorFn(b.val);
+  b.elem=mk('circle',{cx,cy,r:0,fill:b.col,opacity:0,stroke:'rgba(255,255,255,0.65)','stroke-width':1.5},bubblesG);
+});
+
+// ── ANIMACIÓN ─────────────────────────────────────────────────
+const eCubic=t=>1-Math.pow(1-t,3);
+const eBack =t=>{const c1=1.70158,c3=c1+1;return t>=1?1:1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};
+const clamp =(v,a=0,b=1)=>Math.min(Math.max(v,a),b);
+const pt    =(e,s,d)=>clamp((e-s)/d);
+
+const T0=340,BD=460,BS=240;
+const TOTAL=T0+(BUBBLES.length-1)*BS+BD+380;
+
+function update(e){
+  titleEl.setAttribute('opacity',eCubic(pt(e,0,320)));
+  lgG.setAttribute('opacity',    eCubic(pt(e,110,300)));
+  BUBBLES.forEach((b,i)=>{
+    const tt=eBack(pt(e,T0+i*BS,BD));
+    b.elem.setAttribute('r',+(b.maxR*Math.max(tt,0)).toFixed(1));
+    b.elem.setAttribute('opacity',+clamp(tt*1.8).toFixed(2));
+  });
+  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';
+}
+
+// ── ESTADO ────────────────────────────────────────────────────
+let segStart=null,acc=0,state='idle',raf=null;
+const btnPlay=document.getElementById('btnPlay');
+const btnPause=document.getElementById('btnPause');
+const btnReset=document.getElementById('btnReset');
+function sync(){
+  btnPause.disabled=state!=='playing';
+  btnReset.disabled=state==='idle';
+  btnPlay.disabled=state==='playing';
+  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';
+}
+function play(){
+  segStart=performance.now();state='playing';sync();
+  (function loop(){
+    if(state!=='playing')return;
+    const e=acc+(performance.now()-segStart);
+    update(e);
+    if(e>=TOTAL){update(TOTAL);state='done';sync();}
+    else raf=requestAnimationFrame(loop);
+  })();
+}
+function pause(){cancelAnimationFrame(raf);acc+=performance.now()-segStart;segStart=null;state='paused';sync();}
+function reset(){
+  cancelAnimationFrame(raf);acc=0;segStart=null;state='idle';
+  titleEl.setAttribute('opacity',0);lgG.setAttribute('opacity',0);
+  BUBBLES.forEach(b=>{b.elem.setAttribute('r',0);b.elem.setAttribute('opacity',0);});
+  document.getElementById('pFill').style.width='0%';sync();
+}
+btnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});
+btnPause.addEventListener('click',pause);
+btnReset.addEventListener('click',reset);
+sync();
+</script>

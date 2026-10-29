@@ -1,0 +1,156 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}
+.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:720px}
+#chart{width:100%;height:auto;display:block}
+.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.btn{padding:7px 18px;border:0.5px solid var(--border-strong);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--surface-2);color:var(--text-primary);transition:background .12s,transform .12s,box-shadow .12s}
+.btn:hover:not(:disabled){background:var(--surface-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn-primary{background:#1d3f7a;color:#fff;border-color:#1d3f7a}
+.btn-primary:hover:not(:disabled){background:#254d96}
+.pbar{height:2px;background:var(--border);border-radius:99px;margin-top:12px;overflow:hidden}
+.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#1d3557,#5bc8e0);border-radius:99px}
+</style>
+
+<div class="card">
+  <svg id="chart" viewBox="0 0 720 478" xmlns="http://www.w3.org/2000/svg"
+    role="img" aria-label="Evolución Homo sapiens y Homo Aeris de 1986 a 2082 — doble curva sigmoide en X"></svg>
+  <div class="controls">
+    <button class="btn btn-primary" id="btnPlay">▶ Reproducir</button>
+    <button class="btn" id="btnPause" disabled>⏸ Pausar</button>
+    <button class="btn" id="btnReset" disabled>↺ Reiniciar</button>
+  </div>
+  <div class="pbar"><div class="pbar-fill" id="pFill"></div></div>
+</div>
+
+<script>
+// ── MODELO SIGMOIDE ───────────────────────────────────────────
+// k=0.10, t0=2046 — calibrado para cruce ~2048 a ~47%
+const Ls=yr=>1/(1+Math.exp(-0.10*(yr-2046)));
+const aeris  =yr=>89*Ls(yr);
+const sapiens=yr=>100-88*Ls(yr);
+
+// ── LAYOUT ────────────────────────────────────────────────────
+const pL=55,pR=188,pT=72,pB=48;
+const cW=477,cH=358,VW=720,VH=478;
+const X_MIN=1984,X_MAX=2086;
+const xPx=yr=>pL+(yr-X_MIN)*cW/(X_MAX-X_MIN);
+const yPx=v =>pT+(100-v)*cH/100;
+
+const ff="'Segoe UI',-apple-system,sans-serif";
+const ISD=document.documentElement.dataset.mode==='dark'||(!document.documentElement.dataset.mode&&matchMedia('(prefers-color-scheme:dark)').matches);
+const TC =ISD?'#f0efec':'#111';
+const TC2=ISD?'#898781':'#999';
+const GC =ISD?'#2c2c2a':'#e8e8e8';
+const AC =ISD?'#444'   :'#333';
+
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};
+const mkt=(s,a,p)=>{const e=mk('text',a,p);e.textContent=String(s);return e;};
+
+const svg=document.getElementById('chart');
+mk('rect',{x:0,y:0,width:VW,height:VH,fill:'transparent'},svg);
+
+// Título
+const titleEl=mkt('Evolución Homo sapiens / Homo Aeris',{
+  x:pL,y:30,'font-size':21,'font-weight':700,
+  fill:TC,opacity:0,'font-family':ff,'letter-spacing':'-0.3'
+},svg);
+
+// Grid
+const gridG=mk('g',{opacity:0},svg);
+[0,10,20,30,40,50,60,70,80,90,100].forEach(v=>{
+  const y=+yPx(v).toFixed(1);
+  mk('line',{x1:pL,y1:y,x2:pL+cW,y2:y,stroke:v===0?AC:GC,'stroke-width':1},gridG);
+  mkt(v,{x:pL-7,y,'text-anchor':'end','dominant-baseline':'middle','font-size':10.5,fill:TC2,'font-family':ff},gridG);
+});
+[1990,2000,2010,2020,2030,2040,2050,2060,2070,2080].forEach(yr=>{
+  mkt(yr,{x:+xPx(yr).toFixed(1),y:pT+cH+16,'text-anchor':'middle','font-size':10.5,fill:TC2,'font-family':ff},gridG);
+});
+mk('line',{x1:pL,y1:pT,x2:pL,y2:pT+cH,stroke:AC,'stroke-width':0.8},gridG);
+
+// ── PATHS ─────────────────────────────────────────────────────
+function genPts(fn){
+  const p=[];
+  for(let yr=1986;yr<=2082;yr++) p.push([+xPx(yr).toFixed(2),+yPx(fn(yr)).toFixed(2)]);
+  return p;
+}
+function pLen(pts){let l=0;for(let i=1;i<pts.length;i++)l+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);return l;}
+function toD(pts){return'M'+pts[0][0]+','+pts[0][1]+pts.slice(1).map(p=>'L'+p[0]+','+p[1]).join('');}
+
+const ptA=genPts(aeris),ptS=genPts(sapiens);
+const TLA=+(pLen(ptA)*1.01).toFixed(2),TLS=+(pLen(ptS)*1.01).toFixed(2);
+
+function mkLine(d,TL,col){
+  return mk('path',{d,fill:'none',stroke:col,'stroke-width':2.5,
+    'stroke-linecap':'round','stroke-linejoin':'round',
+    'stroke-dasharray':TL,'stroke-dashoffset':TL},svg);
+}
+const lineA=mkLine(toD(ptA),TLA,ISD?'#7ab3e8':'#1d3557');
+const lineS=mkLine(toD(ptS),TLS,'#5bc8e0');
+
+// Etiquetas al final de cada línea
+const eX=+(ptA[ptA.length-1][0]+12).toFixed(1);
+const CA=ISD?'#7ab3e8':'#1d3557';
+const labelA=mkt('Homo_Aeris_porcentaje', {x:eX,y:ptA[ptA.length-1][1],'dominant-baseline':'middle','font-size':9.5,fill:CA,   opacity:0,'font-family':ff},svg);
+const labelS=mkt('Homo_sapiens_porcentaje',{x:eX,y:ptS[ptS.length-1][1],'dominant-baseline':'middle','font-size':9.5,fill:'#5bc8e0',opacity:0,'font-family':ff},svg);
+
+mkt('Creado con Datawrapper',{x:pL,y:VH-12,'font-size':10,fill:TC2,'font-family':ff},svg);
+
+// ── EASING ────────────────────────────────────────────────────
+const eCubic=t=>1-Math.pow(1-t,3);
+const eSin  =t=>-(Math.cos(Math.PI*t)-1)/2;
+const clamp =(v,a=0,b=1)=>Math.min(Math.max(v,a),b);
+const pt    =(e,s,d)=>clamp((e-s)/d);
+
+const T0=380,LD=2700,TOTAL=T0+LD+380;
+
+function update(e){
+  titleEl.setAttribute('opacity',eCubic(pt(e,0,340)));
+  gridG.setAttribute('opacity',  eCubic(pt(e,140,360)));
+  const lt=eSin(pt(e,T0,LD));
+  lineA.setAttribute('stroke-dashoffset',+(TLA*(1-lt)).toFixed(2));
+  lineS.setAttribute('stroke-dashoffset',+(TLS*(1-lt)).toFixed(2));
+  const lab=eCubic(clamp((lt-0.88)/0.12));
+  labelA.setAttribute('opacity',lab);
+  labelS.setAttribute('opacity',lab);
+  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';
+}
+
+// ── ESTADO ────────────────────────────────────────────────────
+let segStart=null,acc=0,state='idle',raf=null;
+const btnPlay=document.getElementById('btnPlay');
+const btnPause=document.getElementById('btnPause');
+const btnReset=document.getElementById('btnReset');
+function sync(){
+  btnPause.disabled=state!=='playing';
+  btnReset.disabled=state==='idle';
+  btnPlay.disabled=state==='playing';
+  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';
+}
+function play(){
+  segStart=performance.now();state='playing';sync();
+  (function loop(){
+    if(state!=='playing')return;
+    const e=acc+(performance.now()-segStart);
+    update(e);
+    if(e>=TOTAL){update(TOTAL);state='done';sync();}
+    else raf=requestAnimationFrame(loop);
+  })();
+}
+function pause(){cancelAnimationFrame(raf);acc+=performance.now()-segStart;segStart=null;state='paused';sync();}
+function reset(){
+  cancelAnimationFrame(raf);acc=0;segStart=null;state='idle';
+  titleEl.setAttribute('opacity',0);gridG.setAttribute('opacity',0);
+  lineA.setAttribute('stroke-dashoffset',TLA);lineS.setAttribute('stroke-dashoffset',TLS);
+  labelA.setAttribute('opacity',0);labelS.setAttribute('opacity',0);
+  document.getElementById('pFill').style.width='0%';sync();
+}
+btnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});
+btnPause.addEventListener('click',pause);
+btnReset.addEventListener('click',reset);
+sync();
+</script>

@@ -1,0 +1,181 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}
+.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:720px}
+#chart{width:100%;height:auto;display:block}
+.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.btn{padding:7px 18px;border:0.5px solid var(--border-strong);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--surface-2);color:var(--text-primary);transition:background .12s,transform .12s,box-shadow .12s}
+.btn:hover:not(:disabled){background:var(--surface-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn-primary{background:#1d3f7a;color:#fff;border-color:#1d3f7a}
+.btn-primary:hover:not(:disabled){background:#254d96}
+.pbar{height:2px;background:var(--border);border-radius:99px;margin-top:12px;overflow:hidden}
+.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#0d2240,#b0e4f5);border-radius:99px}
+</style>
+
+<div class="card">
+  <svg id="chart" viewBox="0 0 720 545" xmlns="http://www.w3.org/2000/svg"
+    role="img" aria-label="Índice de adaptación biológica comparado entre Homo sapiens, Homo Aeris, Skywhales y Leviatanes"></svg>
+  <div class="controls">
+    <button class="btn btn-primary" id="btnPlay">▶ Reproducir</button>
+    <button class="btn" id="btnPause" disabled>⏸ Pausar</button>
+    <button class="btn" id="btnReset" disabled>↺ Reiniciar</button>
+  </div>
+  <div class="pbar"><div class="pbar-fill" id="pFill"></div></div>
+</div>
+
+<script>
+const DATA=[
+  {label:'Homo sapiens', vals:[18,12,15,10,14]},
+  {label:'Homo Aeris',   vals:[91,78,84,88,85.25]},
+  {label:'Skywhales',    vals:[96,94,89,92,92.75]},
+  {label:'Leviatanes',   vals:[99,97,96,98,97.5]},
+];
+const COLORS=['#b0e4f5','#3ab4d8','#1d3f7a','#5bc8e0','#0d2240'];
+const KEYS=['Adaptación_pulmonar','Adaptación_dermal','Adaptación_metabólica','Adaptación_sensorial','Índice_promedio'];
+const VTXT=['#1d3f7a','#fff','#fff','#1d3f7a','#fff']; // val label color per bar type
+const fmt=v=>Number.isInteger(v)?String(v):String(v).replace('.',',');
+
+const VW=720,VH=545,pL=200,pR=50,pT=104,pB=24;
+const cW=VW-pL-pR,cH=VH-pT-pB; // 470, 417
+const N=DATA.length,NB=5;
+const GH=cH/N;           // ~104.25
+const BH=16,BG_I=4;
+const STACK=NB*BH+(NB-1)*BG_I; // 96
+const TOP=(GH-STACK)*0.5;       // ~4.1
+const XS=cW/100;                // 4.7
+
+const dk=()=>document.documentElement.dataset.mode==='dark'||(!document.documentElement.dataset.mode&&matchMedia('(prefers-color-scheme:dark)').matches);
+const tc =()=>dk()?'#f0efec':'#111';
+const tc2=()=>dk()?'#c3c2b7':'#555';
+const tc3=()=>dk()?'#898781':'#aaa';
+const gc =()=>dk()?'#2c2c2a':'#ebebeb';
+
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};
+const mkt=(s,a,p)=>{const e=mk('text',a,p);e.textContent=String(s);return e;};
+const ff="'Segoe UI',-apple-system,sans-serif";
+
+const svg=document.getElementById('chart');
+mk('rect',{x:0,y:0,width:VW,height:VH,fill:'transparent'},svg);
+const root=mk('g',{transform:`translate(${pL},${pT})`},svg);
+
+// Title
+const titleEl=mkt('índice de adaptación biológica de especies',{
+  x:-pL,y:-pT+28,'font-size':17.5,'font-weight':700,
+  fill:tc(),opacity:0,'font-family':ff,'letter-spacing':'-0.3'
+},root);
+
+// Legend — 2 rows
+const lgG=mk('g',{opacity:0},root);
+const LY1=-pT+52,LY2=-pT+70;
+[
+  {i:0,dx:0,row:0},{i:1,dx:148,row:0},{i:2,dx:284,row:0},
+  {i:3,dx:0,row:1},{i:4,dx:148,row:1}
+].forEach(({i,dx,row})=>{
+  const LY=row===0?LY1:LY2;
+  mk('rect',{x:-pL+dx,y:LY,width:12,height:12,fill:COLORS[i],rx:2},lgG);
+  mkt(KEYS[i],{x:-pL+dx+17,y:LY+9.5,'font-size':10,fill:tc2(),'font-family':ff},lgG);
+});
+
+// Grid
+const gridG=mk('g',{opacity:0},root);
+[0,25,50,75,100].forEach(v=>{
+  const x=v*XS;
+  mk('line',{x1:x,y1:0,x2:x,y2:cH,stroke:gc(),'stroke-width':1},gridG);
+  mkt(v,{x,y:-8,'text-anchor':'middle','font-size':9.5,fill:tc3(),'font-family':ff},gridG);
+});
+mk('line',{x1:0,y1:0,x2:0,y2:cH,stroke:dk()?'#383835':'#d0d0cc','stroke-width':1},gridG);
+
+// Bars, labels, value labels
+const barsG=mk('g',{},root),labG=mk('g',{},root),vlabG=mk('g',{},root);
+const bars=[];
+
+DATA.forEach((d,gi)=>{
+  const gy=gi*GH+TOP;
+  const lbl=mkt(d.label,{
+    x:-12,y:gy+STACK/2,
+    'text-anchor':'end','dominant-baseline':'middle',
+    'font-size':12.2,fill:tc(),opacity:0,'font-family':ff,
+    'font-style':d.label.startsWith('Homo')?'italic':'normal'
+  },labG);
+
+  d.vals.forEach((val,bi)=>{
+    const tw=val*XS;
+    const by=gy+bi*(BH+BG_I);
+    const r=mk('rect',{x:0,y:by,width:0,height:BH,fill:COLORS[bi],rx:2},barsG);
+    const vl=mkt(fmt(val),{
+      x:5,y:by+BH/2,'dominant-baseline':'central',
+      'font-size':bi===4?9.5:10,'font-weight':700,
+      fill:VTXT[bi],opacity:0,'font-family':ff
+    },vlabG);
+    bars.push({r,vl,lbl,tw,gi,bi});
+  });
+});
+
+mkt('Creado con Datawrapper',{
+  x:-pL,y:cH+16,'font-size':10,fill:tc3(),'font-family':ff
+},root);
+
+// Easing
+const eExp  =t=>t>=1?1:1-Math.pow(2,-10*t);
+const eCubic=t=>1-Math.pow(1-t,3);
+const clamp =(v,a=0,b=1)=>Math.min(Math.max(v,a),b);
+const pt    =(e,s,d)=>clamp((e-s)/d);
+
+// Timing
+const SG=300,SB=55,BD=850,T0=400;
+const TOTAL=T0+(N-1)*SG+(NB-1)*SB+BD+300; // ~2705ms
+
+function update(e){
+  titleEl.setAttribute('opacity',eCubic(pt(e,0,320)));
+  lgG.setAttribute('opacity',    eCubic(pt(e,130,330)));
+  gridG.setAttribute('opacity',  eCubic(pt(e,210,330)));
+
+  bars.forEach(b=>{
+    const gs=T0+b.gi*SG;
+    if(b.bi===0) b.lbl.setAttribute('opacity',eCubic(pt(e,gs-85,220)));
+    const t=eExp(pt(e,gs+b.bi*SB,BD));
+    const w=b.tw*t;
+    b.r.setAttribute('width',w);
+    b.vl.setAttribute('opacity',eCubic(clamp((w-20)/16)));
+  });
+  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';
+}
+
+// State
+let segStart=null,acc=0,state='idle',raf=null;
+const btnPlay=document.getElementById('btnPlay');
+const btnPause=document.getElementById('btnPause');
+const btnReset=document.getElementById('btnReset');
+
+function sync(){
+  btnPause.disabled=state!=='playing';
+  btnReset.disabled=state==='idle';
+  btnPlay.disabled=state==='playing';
+  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';
+}
+function play(){
+  segStart=performance.now();state='playing';sync();
+  (function loop(){
+    if(state!=='playing')return;
+    const e=acc+(performance.now()-segStart);
+    update(e);
+    if(e>=TOTAL){update(TOTAL);state='done';sync();}
+    else raf=requestAnimationFrame(loop);
+  })();
+}
+function pause(){cancelAnimationFrame(raf);acc+=performance.now()-segStart;segStart=null;state='paused';sync();}
+function reset(){
+  cancelAnimationFrame(raf);acc=0;segStart=null;state='idle';
+  titleEl.setAttribute('opacity',0);lgG.setAttribute('opacity',0);gridG.setAttribute('opacity',0);
+  bars.forEach(b=>{b.r.setAttribute('width',0);b.vl.setAttribute('opacity',0);b.lbl.setAttribute('opacity',0);});
+  document.getElementById('pFill').style.width='0%';sync();
+}
+btnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});
+btnPause.addEventListener('click',pause);
+btnReset.addEventListener('click',reset);
+sync();
+</script>

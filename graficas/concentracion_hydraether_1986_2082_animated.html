@@ -1,0 +1,176 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}
+.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:720px}
+#chart{width:100%;height:auto;display:block}
+.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.btn{padding:7px 18px;border:0.5px solid var(--border-strong);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--surface-2);color:var(--text-primary);transition:background .12s,transform .12s,box-shadow .12s}
+.btn:hover:not(:disabled){background:var(--surface-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn-primary{background:#3ab4d8;color:#fff;border-color:#3ab4d8}
+.btn-primary:hover:not(:disabled){background:#2fa0c4}
+.pbar{height:2px;background:var(--border);border-radius:99px;margin-top:12px;overflow:hidden}
+.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#1d3557,#3ab4d8,#b8e9f5);border-radius:99px}
+</style>
+
+<div class="card">
+  <svg id="chart" viewBox="0 0 720 490" xmlns="http://www.w3.org/2000/svg"
+    role="img" aria-label="Concentración de Hydraether 1986 a 2082 — curva sigmoidea"></svg>
+  <div class="controls">
+    <button class="btn btn-primary" id="btnPlay">▶ Reproducir</button>
+    <button class="btn" id="btnPause" disabled>⏸ Pausar</button>
+    <button class="btn" id="btnReset" disabled>↺ Reiniciar</button>
+  </div>
+  <div class="pbar"><div class="pbar-fill" id="pFill"></div></div>
+</div>
+
+<script>
+// ── LAYOUT ────────────────────────────────────────────────────
+const pL=58,pR=172,pT=75,pB=55;
+const cW=490,cH=360,VW=720,VH=490;
+const X_MIN=1984,X_MAX=2086,Y_MIN=0,Y_MAX=38;
+
+const xPx=yr=>pL+(yr-X_MIN)*cW/(X_MAX-X_MIN);
+const yPx=v=> pT+(Y_MAX-v) *cH/(Y_MAX-Y_MIN);
+
+// ── SIGMOID ───────────────────────────────────────────────────
+// k=0.1271, t0=2033.5, L=36 — calibrated from original
+const sig=yr=>36/(1+Math.exp(-0.1271*(yr-2033.5)));
+
+// ── THEME ─────────────────────────────────────────────────────
+const ff="'Segoe UI',-apple-system,sans-serif";
+const dk=()=>document.documentElement.dataset.mode==='dark'||(!document.documentElement.dataset.mode&&matchMedia('(prefers-color-scheme:dark)').matches);
+const txc =()=>dk()?'#f0efec':'#111';
+const txc2=()=>dk()?'#898781':'#999';
+const gclr=()=>dk()?'#2c2c2a':'#e8e8e8';
+const aclr=()=>dk()?'#444':'#333';
+
+// ── SVG HELPERS ───────────────────────────────────────────────
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};
+const mkt=(s,a,p)=>{const e=mk('text',a,p);e.textContent=String(s);return e;};
+
+const svg=document.getElementById('chart');
+mk('rect',{x:0,y:0,width:VW,height:VH,fill:'transparent'},svg);
+
+// ── TITLE ─────────────────────────────────────────────────────
+const titleEl=mkt('Concentración de Hydraether 1986\u20132082',{
+  x:pL,y:30,'font-size':21,'font-weight':700,
+  fill:txc(),opacity:0,'font-family':ff,'letter-spacing':'-0.3'
+},svg);
+
+// ── GRID ──────────────────────────────────────────────────────
+const gridG=mk('g',{opacity:0},svg);
+
+// Horizontal gridlines + Y labels
+[0,5,10,15,20,25,30,35].forEach(v=>{
+  const y=+yPx(v).toFixed(1);
+  mk('line',{x1:pL,y1:y,x2:pL+cW,y2:y,
+    stroke:v===0?aclr():gclr(),'stroke-width':1},gridG);
+  mkt(v,{x:pL-7,y,'text-anchor':'end','dominant-baseline':'middle',
+    'font-size':10.5,fill:txc2(),'font-family':ff},gridG);
+});
+
+// X-axis labels
+[1990,2000,2010,2020,2030,2040,2050,2060,2070,2080].forEach(yr=>{
+  mkt(yr,{x:+xPx(yr).toFixed(1),y:pT+cH+16,'text-anchor':'middle',
+    'font-size':10.5,fill:txc2(),'font-family':ff},gridG);
+});
+
+// ── GENERATE LINE DATA ────────────────────────────────────────
+const PTS=[];
+for(let yr=1986;yr<=2082;yr++){
+  PTS.push([+xPx(yr).toFixed(2), +yPx(sig(yr)).toFixed(2)]);
+}
+
+// Manual path length (sum of Euclidean distances)
+let TL=0;
+for(let i=1;i<PTS.length;i++) TL+=Math.hypot(PTS[i][0]-PTS[i-1][0],PTS[i][1]-PTS[i-1][1]);
+TL=+(TL*1.01).toFixed(2); // 1% buffer
+
+// Path d attribute
+const PD='M'+PTS[0][0]+','+PTS[0][1]+PTS.slice(1).map(p=>'L'+p[0]+','+p[1]).join('');
+
+// Line element (initially hidden via dashoffset)
+const lineEl=mk('path',{
+  d:PD,fill:'none',stroke:'#3ab4d8','stroke-width':2.5,
+  'stroke-linecap':'round','stroke-linejoin':'round',
+  'stroke-dasharray':TL,'stroke-dashoffset':TL
+},svg);
+
+// End-of-line label
+const endX=+(PTS[PTS.length-1][0]+10).toFixed(1);
+const endY=PTS[PTS.length-1][1];
+const labelEl=mkt('Concentración_HAE_porcentaje',{
+  x:endX,y:endY,'dominant-baseline':'middle',
+  'font-size':9.5,fill:dk()?'#5bc8e0':'#3ab4d8',
+  opacity:0,'font-family':ff
+},svg);
+
+// Credit
+mkt('Creado con Datawrapper',{
+  x:pL,y:VH-12,'font-size':10,fill:txc2(),'font-family':ff
+},svg);
+
+// ── EASING ────────────────────────────────────────────────────
+const eCubic=t=>1-Math.pow(1-t,3);
+const eSin  =t=>-(Math.cos(Math.PI*t)-1)/2;
+const clamp =(v,a=0,b=1)=>Math.min(Math.max(v,a),b);
+const pt    =(e,s,d)=>clamp((e-s)/d);
+
+// ── TIMING ────────────────────────────────────────────────────
+const T0=380,LINE_DUR=2650,TOTAL=T0+LINE_DUR+380;
+
+// ── UPDATE ────────────────────────────────────────────────────
+function update(e){
+  titleEl.setAttribute('opacity',eCubic(pt(e,0,340)));
+  gridG.setAttribute('opacity',  eCubic(pt(e,140,360)));
+
+  const lineT=eSin(pt(e,T0,LINE_DUR));
+  lineEl.setAttribute('stroke-dashoffset',+(TL*(1-lineT)).toFixed(2));
+
+  // Label appears when line is >88% drawn
+  labelEl.setAttribute('opacity',eCubic(clamp((lineT-0.88)/0.12)));
+
+  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';
+}
+
+// ── STATE MACHINE ─────────────────────────────────────────────
+let segStart=null,acc=0,state='idle',raf=null;
+const btnPlay=document.getElementById('btnPlay');
+const btnPause=document.getElementById('btnPause');
+const btnReset=document.getElementById('btnReset');
+
+function sync(){
+  btnPause.disabled=state!=='playing';
+  btnReset.disabled=state==='idle';
+  btnPlay.disabled=state==='playing';
+  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';
+}
+function play(){
+  segStart=performance.now();state='playing';sync();
+  (function loop(){
+    if(state!=='playing')return;
+    const e=acc+(performance.now()-segStart);
+    update(e);
+    if(e>=TOTAL){update(TOTAL);state='done';sync();}
+    else raf=requestAnimationFrame(loop);
+  })();
+}
+function pause(){cancelAnimationFrame(raf);acc+=performance.now()-segStart;segStart=null;state='paused';sync();}
+function reset(){
+  cancelAnimationFrame(raf);acc=0;segStart=null;state='idle';
+  titleEl.setAttribute('opacity',0);
+  gridG.setAttribute('opacity',0);
+  lineEl.setAttribute('stroke-dashoffset',TL);
+  labelEl.setAttribute('opacity',0);
+  document.getElementById('pFill').style.width='0%';
+  sync();
+}
+btnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});
+btnPause.addEventListener('click',pause);
+btnReset.addEventListener('click',reset);
+sync();
+</script>

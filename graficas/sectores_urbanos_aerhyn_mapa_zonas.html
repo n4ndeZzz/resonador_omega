@@ -1,0 +1,181 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}
+.card{background:#07090d;border:0.5px solid #1a2030;border-radius:12px;padding:22px 20px 18px;width:100%;max-width:530px}
+#chart{width:100%;height:auto;display:block}
+.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.btn{padding:7px 18px;border:0.5px solid #252d3a;border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:#111827;color:#c8d8e8;transition:background .12s,transform .12s}
+.btn:hover:not(:disabled){background:#1a2538;transform:translateY(-1px)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn-primary{background:#1a4a8a;color:#fff;border-color:#2060b0}
+.btn-primary:hover:not(:disabled){background:#2060b0}
+.pbar{height:2px;background:#1a2030;border-radius:99px;margin-top:12px;overflow:hidden}
+.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#1565c0,#4fc3f7);border-radius:99px}
+</style>
+
+<div class="card">
+  <svg id="chart" viewBox="0 0 560 690" xmlns="http://www.w3.org/2000/svg"
+    role="img" aria-label="Mapa de sectores urbanos — zonas HAE de Aerhyn"></svg>
+  <div class="controls">
+    <button class="btn btn-primary" id="btnPlay">▶ Reproducir</button>
+    <button class="btn" id="btnPause" disabled>⏸ Pausar</button>
+    <button class="btn" id="btnReset" disabled>↺ Reiniciar</button>
+  </div>
+  <div class="pbar"><div class="pbar-fill" id="pFill"></div></div>
+</div>
+
+<script>
+const VW=560,VH=690;
+const ff="'Segoe UI',-apple-system,sans-serif";
+const NS='http://www.w3.org/2000/svg';
+const mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};
+
+const svg=document.getElementById('chart');
+mk('rect',{x:0,y:0,width:VW,height:VH,fill:'#07090d'},svg);
+
+// ── LÍMITE CIUDAD ─────────────────────────────────────────────
+// Polígono octagonal irregular, calibrado contra la imagen original
+const CITY="22,72 188,48 355,57 445,100 488,214 476,378 456,498 386,568 276,610 156,602 60,558 16,446 10,312 16,172 22,72";
+
+const defs=mk('defs',{},svg);
+
+// Clip path para las calles
+const clip=mk('clipPath',{id:'cClip'},defs);
+mk('polygon',{points:CITY},clip);
+
+// Relleno base de la ciudad
+mk('polygon',{points:CITY,fill:'#1c2235'},svg);
+
+// ── MALLA DE CALLES (clipeada al polígono ciudad) ──────────────
+const gridG=mk('g',{'clip-path':'url(#cClip)'},svg);
+
+// Horizontales cada 22px
+for(let y=48;y<=612;y+=22)
+  mk('line',{x1:5,y1:y,x2:555,y2:y,stroke:'#0b1020','stroke-width':1.3},gridG);
+
+// Verticales cada 22px
+for(let x=5;x<=555;x+=22)
+  mk('line',{x1:x,y1:45,x2:x,y2:615,stroke:'#0b1020','stroke-width':1.3},gridG);
+
+// Diagonales NW-SE cada 38px (avenue principale)
+for(let d=-600;d<=700;d+=38)
+  mk('line',{x1:-10,y1:d,x2:660,y2:d+680,stroke:'#0b1020','stroke-width':0.65},gridG);
+
+// Diagonales NE-SW cada 38px
+for(let d=-250;d<=980;d+=38)
+  mk('line',{x1:-10,y1:d,x2:660,y2:d-680,stroke:'#0b1020','stroke-width':0.65},gridG);
+
+// Avenidas diagonales principales (más anchas, cada 76px)
+for(let d=-600;d<=700;d+=76)
+  mk('line',{x1:-10,y1:d,x2:660,y2:d+680,stroke:'#0a0f1e','stroke-width':2.5},gridG);
+for(let d=-250;d<=980;d+=76)
+  mk('line',{x1:-10,y1:d,x2:660,y2:d-680,stroke:'#0a0f1e','stroke-width':2.5},gridG);
+
+// Borde ciudad
+mk('polygon',{points:CITY,fill:'none',stroke:'#2a3548','stroke-width':2},svg);
+
+// ── ZONAS (inicialmente invisibles) ───────────────────────────
+const ZONES=[
+  {
+    // Resonador Ω — franja izquierda, parcialmente fuera de la ciudad
+    rows:['Resonador','Ω'],
+    pts:"8,378 102,370 132,390 138,425 132,462 114,494 70,508 8,500 8,378",
+    lx:68, ly:438
+  },
+  {
+    // Zona Umbral — centro-derecha, dentro ciudad
+    rows:['Zona','Umbral'],
+    pts:"268,324 348,318 400,342 412,378 410,424 385,458 340,468 296,460 260,434 254,398 258,355 268,324",
+    lx:334, ly:391
+  },
+  {
+    // Zona de emulsión — centro-inferior
+    rows:['Zona de','emulsión'],
+    pts:"178,472 262,464 334,480 348,512 334,552 296,572 242,572 198,554 172,524 170,494 178,472",
+    lx:262, ly:518
+  },
+  {
+    // Reactor 4 — gran cuchilla diagonal superior-derecha
+    rows:['Reactor 4'],
+    pts:"420,425 406,295 398,162 418,70 462,40 510,52 545,98 550,208 532,336 496,432 460,448 426,442 420,425",
+    lx:472, ly:225
+  }
+];
+
+// Crear grupos de zona
+const ZDATA=ZONES.map(z=>{
+  const g=mk('g',{opacity:0},svg);
+  mk('polygon',{points:z.pts,fill:'#1976d2',opacity:0.87},g);
+
+  // Etiqueta multilínea
+  const txt=mk('text',{
+    x:z.lx,'text-anchor':'middle',
+    'font-size':11,'font-weight':700,fill:'#fff','font-family':ff
+  },g);
+  const n=z.rows.length, dy0=z.ly-(n-1)*8;
+  z.rows.forEach((row,i)=>{
+    const s=mk('tspan',{x:z.lx,y:dy0+i*16,'dominant-baseline':'middle'},txt);
+    s.textContent=row;
+  });
+  return{g};
+});
+
+// ── TÍTULO ────────────────────────────────────────────────────
+const titleEl=mk('text',{
+  x:15,y:22,'font-size':14,'font-weight':700,fill:'#a0b8d8',opacity:0,
+  'font-family':ff,'letter-spacing':'-0.2'
+},svg);
+titleEl.textContent='Concentración HAE por sector';
+
+mk('text',{x:VW-15,y:VH-10,'text-anchor':'end','font-size':9,fill:'#1e2a38','font-family':ff},svg)
+  .textContent='Creado con Datawrapper';
+
+// ── ANIMACIÓN ─────────────────────────────────────────────────
+const eCubic=t=>1-Math.pow(1-t,3);
+const clamp=(v,a=0,b=1)=>Math.min(Math.max(v,a),b);
+const pt=(e,s,d)=>clamp((e-s)/d);
+
+const T0=300,ZDUR=420,STAGGER=380;
+const TOTAL=T0+(ZONES.length-1)*STAGGER+ZDUR+350;
+
+function update(e){
+  titleEl.setAttribute('opacity',eCubic(pt(e,0,320)));
+  ZDATA.forEach((z,i)=>z.g.setAttribute('opacity',eCubic(pt(e,T0+i*STAGGER,ZDUR))));
+  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';
+}
+
+// ── MÁQUINA DE ESTADOS ────────────────────────────────────────
+let segStart=null,acc=0,state='idle',raf=null;
+const btnPlay=document.getElementById('btnPlay');
+const btnPause=document.getElementById('btnPause');
+const btnReset=document.getElementById('btnReset');
+function sync(){
+  btnPause.disabled=state!=='playing';
+  btnReset.disabled=state==='idle';
+  btnPlay.disabled=state==='playing';
+  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';
+}
+function play(){
+  segStart=performance.now();state='playing';sync();
+  (function loop(){
+    if(state!=='playing')return;
+    const e=acc+(performance.now()-segStart);
+    update(e);
+    if(e>=TOTAL){update(TOTAL);state='done';sync();}
+    else raf=requestAnimationFrame(loop);
+  })();
+}
+function pause(){cancelAnimationFrame(raf);acc+=performance.now()-segStart;segStart=null;state='paused';sync();}
+function reset(){
+  cancelAnimationFrame(raf);acc=0;segStart=null;state='idle';
+  titleEl.setAttribute('opacity',0);
+  ZDATA.forEach(z=>z.g.setAttribute('opacity',0));
+  document.getElementById('pFill').style.width='0%';sync();
+}
+btnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});
+btnPause.addEventListener('click',pause);
+btnReset.addEventListener('click',reset);
+sync();
+</script>
