@@ -1,8 +1,12 @@
 /* ============================================================
    Visor interactivo del Resonador Ω — seis estados sobre un mismo modelo
+   ResonadorApp(): sin opciones se construye y anima solo (comportamiento original).
+   Con { external: true } empieza inactivo y cede el bucle a experiencia.js (RES.update/enter/exit).
    ============================================================ */
-(function () {
+window.ResonadorApp = function (opts) {
   'use strict';
+  opts = opts || {};
+  let active = !opts.external;
   const T = THREE, PI = Math.PI, D2R = PI / 180;
   const $ = function (s) { return document.querySelector(s); };
   const M = ResonadorModel.build();
@@ -23,6 +27,7 @@
   const controls = new T.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true; controls.dampingFactor = 0.08; controls.target.set(0, 6, 0);
   controls.minDistance = 2.5; controls.maxDistance = 110; controls.maxPolarAngle = PI * 0.52;
+  controls.enabled = active;
   scene.add(M.root);
 
   // entorno de estudio (reflejos para el metal)
@@ -243,10 +248,11 @@
     tgt = { t: s.t, cut: s.cut, xray: s.xray, tint: s.tint, guides: s.guides || 0 };
     if (s.xr) stateXr = s.xr;
     activeLabels = s.labels; wantInset = !!s.inset;
-    tween = { t0: performance.now(), dur: 1500, p0: camera.position.clone(), t0v: controls.target.clone(), p1: new T.Vector3().fromArray(s.cam.p), t1: new T.Vector3().fromArray(s.cam.t) };
+    tween = !active ? null : { t0: performance.now(), dur: 1500, p0: camera.position.clone(), t0v: controls.target.clone(), p1: new T.Vector3().fromArray(s.cam.p), t1: new T.Vector3().fromArray(s.cam.t) };
     renderUI();
   }
   window.addEventListener('keydown', function (e) {
+    if (!active) return;
     if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
     const ids = ['general', 'despiece', 'explosion', 'corte', 'transparencia', 'acercamiento'], i = parseInt(e.key, 10);
     if (i >= 1 && i <= 6) go(ids[i - 1]);
@@ -332,6 +338,7 @@
   const ray = new T.Raycaster(), mouse = new T.Vector2(); let down = null;
   renderer.domElement.addEventListener('pointerdown', function (e) { down = [e.clientX, e.clientY]; });
   renderer.domElement.addEventListener('pointerup', function (e) {
+    if (!active) return;
     if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
     const r = renderer.domElement.getBoundingClientRect();
     mouse.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
@@ -418,7 +425,7 @@
     M.SECTION.value = cs ? 1 : 0;
     const cMin = (1 - cutOpen) * 3.2, c = 8 + (cMin - 8) * cur.cut;
     M.CUT.planes[0].constant = c; M.CUT.planes[1].constant = c;
-    cotas.visible = showCotas && activeState().cotas && cur.t < .05;
+    cotas.visible = active && showCotas && activeState().cotas && cur.t < .05;
     const core = byId.Nucleo_Omega; core.getWorldPosition(tmp); fx.position.copy(tmp);
     fx.visible = true;
   }
@@ -485,13 +492,24 @@
   }
   function render3() { renderer.render(scene, camera); }
   let last = performance.now();
-  function loop(now) {
-    requestAnimationFrame(loop);
+  function update(now) {
     const dt = Math.min(.05, (now - last) / 1000); last = now;
-    step(dt); controls.update(); applyModel(); render3(); drawLabels();
-    const showIn = wantInset && cur.xray > .6; insetEl.classList.toggle('show', showIn);
+    step(dt); if (active) controls.update(); applyModel(); render3(); if (active) drawLabels();
+    const showIn = active && wantInset && cur.xray > .6; insetEl.classList.toggle('show', showIn);
     if (showIn) { mol.rotation.y += dt * .35; mol.rotation.x = Math.sin(now / 3000) * .15; ir.render(isc, icam); }
   }
-  renderUI(); requestAnimationFrame(loop);
-  window.RES = { go: go, camera: camera, controls: controls, units: byId, cur: cur, scene: scene, renderer: renderer, M: M };
-})();
+  function loop(now) { requestAnimationFrame(loop); update(now); }
+  // modo experiencia: entrar activa controles e interfaz; salir deja el modelo en General y limpia la capa 2D
+  function enter() { active = true; controls.enabled = true; go('general'); }
+  function exit() {
+    active = false; controls.enabled = false; selected = null; go('general');
+    svg.innerHTML = ''; cotaH.hidden = cotaD.hidden = true; insetEl.classList.remove('show');
+    panel.classList.remove('open'); $('#btnPanel').setAttribute('aria-pressed', false); $('#app').classList.remove('pan');
+  }
+  renderUI(); if (!opts.external) requestAnimationFrame(loop);
+  window.RES = { go: go, camera: camera, controls: controls, units: byId, cur: cur, scene: scene, renderer: renderer, M: M,
+    enter: enter, exit: exit, update: update, floor: floor, home: STATES.general.cam,
+    state: function () { return { active: active, id: stateId, zone: zoneId }; } };
+  return window.RES;
+};
+if (!window.RES_EXTERNAL) window.ResonadorApp();
