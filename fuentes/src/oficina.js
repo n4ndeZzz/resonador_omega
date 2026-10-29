@@ -204,8 +204,9 @@ window.Oficina = (function () {
         const dist = Math.max(.82 * ui / (TAN * aspect), .5 * ui / TAN), el = 54 * PI / 180;
         return { p: [D.x, DT + dist * Math.sin(el), D.z + .02 + dist * Math.cos(el)], t: [D.x, DT, D.z + .02] };
       }
-      const dist = Math.max(.36 * ui / (TAN * aspect), .82 * ui / TAN), el = 62 * PI / 180;
-      return { p: [D.x + dist * Math.cos(el), DT + dist * Math.sin(el), D.z], t: [D.x, DT, D.z] };
+      // vertical: la barra de papeles ocupa abajo; el centro se corre hacia el lado cercano (+x)
+      const dist = Math.max(.36 * ui / (TAN * aspect), .9 * ui / TAN), el = 62 * PI / 180, tx = D.x + .14;
+      return { p: [tx + dist * Math.cos(el), DT + dist * Math.sin(el), D.z], t: [tx, DT, D.z] };
     }
     function pick(ray) { const h = ray.intersectObjects(papers, false); return h.length ? h[0].object.userData.idx : -1; }
     // punto superior del papel (para la etiqueta flotante)

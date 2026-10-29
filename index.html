@@ -1613,7 +1613,7 @@ window.Laboratorio = (function () {
     /* ---------- vistas de cámara ---------- */
     const TAN = Math.tan(15 * PI / 180);
     function view(aspect) {
-      if (aspect < .9) return { p: [23, 13.5, 33], t: [4.5, 3.2, 5] };       // vertical: oficina delante, reactor detrás
+      if (aspect < .9) return { p: [27, 18, 41], t: [4.5, 4.4, 4.5] };       // vertical: oficina delante, reactor detrás
       const t = new T.Vector3(5.5, 5.0, 4), dir = new T.Vector3(0, .13, 1).normalize();
       const d = Math.max(36, 18.5 / (TAN * aspect), 9 / TAN);
       return { p: t.clone().addScaledVector(dir, d).toArray(), t: t.toArray() };
@@ -1836,8 +1836,9 @@ window.Oficina = (function () {
         const dist = Math.max(.82 * ui / (TAN * aspect), .5 * ui / TAN), el = 54 * PI / 180;
         return { p: [D.x, DT + dist * Math.sin(el), D.z + .02 + dist * Math.cos(el)], t: [D.x, DT, D.z + .02] };
       }
-      const dist = Math.max(.36 * ui / (TAN * aspect), .82 * ui / TAN), el = 62 * PI / 180;
-      return { p: [D.x + dist * Math.cos(el), DT + dist * Math.sin(el), D.z], t: [D.x, DT, D.z] };
+      // vertical: la barra de papeles ocupa abajo; el centro se corre hacia el lado cercano (+x)
+      const dist = Math.max(.36 * ui / (TAN * aspect), .9 * ui / TAN), el = 62 * PI / 180, tx = D.x + .14;
+      return { p: [tx + dist * Math.cos(el), DT + dist * Math.sin(el), D.z], t: [tx, DT, D.z] };
     }
     function pick(ray) { const h = ray.intersectObjects(papers, false); return h.length ? h[0].object.userData.idx : -1; }
     // punto superior del papel (para la etiqueta flotante)
@@ -2114,11 +2115,12 @@ window.Grafica = (function () {
   window.addEventListener('resize', function () { if (ofi) ofi.layout(aspect()); });
 
   /* ---------- etiquetas de zona y de papel ---------- */
-  const zR = $('#zReactor'), zO = $('#zOficina'), pv = new THREE.Vector3();
+  const zR = $('#zReactor'), zO = $('#zOficina'), labUI = $('#labUI'), pv = new THREE.Vector3();
   function toScreen(v) { pv.copy(v).project(camera); return { x: (pv.x + 1) / 2 * app.clientWidth, y: (1 - pv.y) / 2 * app.clientHeight, z: pv.z }; }
   function placeZone(b, z) {
     const s = toScreen(lab.zones[z].anchor), W = app.clientWidth, H = app.clientHeight, bw = b.offsetWidth, bh = b.offsetHeight;
-    const x = Math.min(W - bw / 2 - 12, Math.max(bw / 2 + 12, s.x)), y = Math.min(H - bh - 16, Math.max(96, s.y - bh - 8));
+    const top = labUI.offsetTop + labUI.offsetHeight + 10;      // nunca debajo de la tarjeta «Laboratorio»
+    const x = Math.min(W - bw / 2 - 12, Math.max(bw / 2 + 12, s.x)), y = Math.min(H - bh - 16, Math.max(top, s.y - bh - 8));
     b.style.transform = 'translate(' + (x - bw / 2).toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
     b.classList.toggle('on', lab.hover === z);
   }

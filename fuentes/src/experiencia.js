@@ -181,11 +181,12 @@
   window.addEventListener('resize', function () { if (ofi) ofi.layout(aspect()); });
 
   /* ---------- etiquetas de zona y de papel ---------- */
-  const zR = $('#zReactor'), zO = $('#zOficina'), pv = new THREE.Vector3();
+  const zR = $('#zReactor'), zO = $('#zOficina'), labUI = $('#labUI'), pv = new THREE.Vector3();
   function toScreen(v) { pv.copy(v).project(camera); return { x: (pv.x + 1) / 2 * app.clientWidth, y: (1 - pv.y) / 2 * app.clientHeight, z: pv.z }; }
   function placeZone(b, z) {
     const s = toScreen(lab.zones[z].anchor), W = app.clientWidth, H = app.clientHeight, bw = b.offsetWidth, bh = b.offsetHeight;
-    const x = Math.min(W - bw / 2 - 12, Math.max(bw / 2 + 12, s.x)), y = Math.min(H - bh - 16, Math.max(96, s.y - bh - 8));
+    const top = labUI.offsetTop + labUI.offsetHeight + 10;      // nunca debajo de la tarjeta «Laboratorio»
+    const x = Math.min(W - bw / 2 - 12, Math.max(bw / 2 + 12, s.x)), y = Math.min(H - bh - 16, Math.max(top, s.y - bh - 8));
     b.style.transform = 'translate(' + (x - bw / 2).toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
     b.classList.toggle('on', lab.hover === z);
   }

@@ -320,7 +320,7 @@ window.Laboratorio = (function () {
     /* ---------- vistas de cámara ---------- */
     const TAN = Math.tan(15 * PI / 180);
     function view(aspect) {
-      if (aspect < .9) return { p: [23, 13.5, 33], t: [4.5, 3.2, 5] };       // vertical: oficina delante, reactor detrás
+      if (aspect < .9) return { p: [27, 18, 41], t: [4.5, 4.4, 4.5] };       // vertical: oficina delante, reactor detrás
       const t = new T.Vector3(5.5, 5.0, 4), dir = new T.Vector3(0, .13, 1).normalize();
       const d = Math.max(36, 18.5 / (TAN * aspect), 9 / TAN);
       return { p: t.clone().addScaledVector(dir, d).toArray(), t: t.toArray() };
