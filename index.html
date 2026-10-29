@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Modelo 3D modular e interactivo del Resonador Ω: despiece, explosión, corte, transparencia y acercamiento.">
-<title>Resonador Ω 3D</title>
+<meta name="description" content="Experiencia 3D en el laboratorio del Proyecto Ω: el Resonador Ω (despiece, explosión, corte, transparencia y acercamiento) y la oficina de análisis con las gráficas de AERHYN.">
+<title>Resonador Ω · Laboratorio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow+Semi+Condensed:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow+Semi+Condensed:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 /* Concepto: visor de documentación técnica. Fondo de estudio gris, paneles sobrios y un único acento violeta, el color del núcleo. */
 :root {
@@ -16,16 +16,22 @@
   --f-ui: 'Barlow Semi Condensed', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --f-disp: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
   --f-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  /* archivo del instituto (portada, laboratorio, oficina y dossier) */
+  --paper: #ece4d1; --paper-2: #e1d6bd; --paper-ink: #2a241b; --paper-ink2: #5f5443; --paper-line: #b4a585; --stamp: #a3302a; --copper: #9a5a27;
+  --shade: rgba(14,16,18,.55);
+  --f-doc: 'Special Elite', 'Courier New', Courier, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg1: #2d353d; --bg2: #0d1116; --ink: #e8ecf0; --ink2: #a3aeb9; --panel: rgba(21,26,32,.92); --line: #39434d;
     --accent: #a597ff; --accent-ink: #0d1116; --chip: #29323b; --lead: #aab5c0; --halo: #161b21; --nb: #e8ecf0; --nbt: #0d1116; color-scheme: dark;
+    --paper: #22201c; --paper-2: #2c2924; --paper-ink: #ece4d2; --paper-ink2: #b3a68e; --paper-line: #514a3e; --stamp: #e0675a; --copper: #d08a4d; --shade: rgba(6,7,8,.66);
   }
 }
 :root[data-theme="dark"] {
   --bg1: #2d353d; --bg2: #0d1116; --ink: #e8ecf0; --ink2: #a3aeb9; --panel: rgba(21,26,32,.92); --line: #39434d;
   --accent: #a597ff; --accent-ink: #0d1116; --chip: #29323b; --lead: #aab5c0; --halo: #161b21; --nb: #e8ecf0; --nbt: #0d1116; color-scheme: dark;
+  --paper: #22201c; --paper-2: #2c2924; --paper-ink: #ece4d2; --paper-ink2: #b3a68e; --paper-line: #514a3e; --stamp: #e0675a; --copper: #d08a4d; --shade: rgba(6,7,8,.66);
 }
 html, body { height: 100%; }
 body { margin: 0; background: var(--bg2); color: var(--ink); font: 400 14px/1.45 var(--f-ui); overflow: hidden; }
@@ -94,6 +100,99 @@ header > * { pointer-events: auto; }
 .hint { position: absolute; left: 50%; transform: translateX(-50%); bottom: 14px; z-index: 1; white-space: nowrap; font: 400 11px var(--f-mono); color: var(--ink2); text-align: right; pointer-events: none; }
 @media (max-width: 820px) { #inset { transform: scale(.72); } .hint { display: none; } .brand h1 { font-size: 21px; } #app.pan #info { left: 16px; width: calc(100% - 32px); } }
 @media (prefers-reduced-motion: reduce) { #inset { transition: none; } }
+/* ============ Experiencia: modos y lenguaje de archivo del instituto ============ */
+#app:not(.modo-reactor) > header, #app:not(.modo-reactor) > #panel, #app:not(.modo-reactor) > .hint,
+#app:not(.modo-reactor) > #info, #app:not(.modo-reactor) > #inset, #app:not(.modo-reactor) > #overlay { display: none !important; }
+#app.modo-reactor > header, #app.modo-reactor > #info { animation: aparecer .6s .55s both; }
+@keyframes aparecer { from { opacity: 0; } }
+#app:not(.modo-reactor) #view canvas { cursor: default; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.kick { margin: 0; font: 400 11.5px/1.3 var(--f-doc); letter-spacing: .08em; text-transform: uppercase; color: var(--paper-ink2); }
+.sello { display: inline-block; font: 400 15px/1 var(--f-doc); letter-spacing: .16em; color: var(--stamp); border: 2px solid var(--stamp); outline: 1px solid var(--stamp); outline-offset: 2px; padding: 5px 9px 4px; transform: rotate(-7deg); opacity: .85; }
+.doc-btn { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 400 14px/1.2 var(--f-doc); color: var(--paper-ink); background: var(--paper); border: 1px solid var(--paper-line); border-radius: 2px; padding: 8px 13px; cursor: pointer; text-decoration: none; min-height: 40px; }
+.doc-btn:hover { background: var(--paper-2); }
+.doc-btn:focus-visible, .zona:focus-visible, #papeles button:focus-visible, #btnIniciar:focus-visible, .tool.lab-back:focus-visible { outline: 2px solid var(--copper); outline-offset: 3px; }
+.tool.lab-back { font-family: var(--f-doc); background: var(--paper); color: var(--paper-ink); border-color: var(--paper-line); }
+
+/* carga y portada */
+#carga { position: absolute; inset: 0; z-index: 40; display: grid; place-items: center; background: var(--paper); transition: opacity .6s; padding: 16px; }
+#carga.fuera { opacity: 0; pointer-events: none; }
+#carga[hidden] { display: none; }
+#carga .caja { width: min(420px, 100%); display: grid; gap: 10px; }
+#carga h1 { margin: 0; font: 600 30px/1 var(--f-disp); letter-spacing: .16em; color: var(--paper-ink); }
+#carga .pista { height: 6px; border: 1px solid var(--paper-line); background: var(--paper-2); }
+#cargaBar { height: 100%; width: 0; background: var(--paper-ink); transition: width .25s; }
+#cargaTxt { margin: 0; font: 400 13px var(--f-doc); color: var(--paper-ink2); min-height: 1.3em; }
+#carga.error #cargaTxt { color: var(--stamp); }
+#portada { position: absolute; inset: 0; z-index: 30; display: grid; place-items: center; padding: 16px; background: radial-gradient(90% 80% at 50% 50%, rgba(236,228,209,.45), rgba(236,228,209,.86)); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #portada { background: radial-gradient(90% 80% at 50% 50%, rgba(34,32,28,.35), rgba(34,32,28,.88)); } }
+:root[data-theme="dark"] #portada { background: radial-gradient(90% 80% at 50% 50%, rgba(34,32,28,.35), rgba(34,32,28,.88)); }
+#portada[hidden] { display: none; }
+.cubierta { position: relative; width: min(560px, 100%); background: var(--paper); border: 1px solid var(--paper-line); box-shadow: 0 24px 70px rgba(0,0,0,.35); padding: 34px 32px 30px; color: var(--paper-ink); }
+.cubierta::before { content: ''; position: absolute; inset: 8px; border: 1px solid var(--paper-line); pointer-events: none; }
+.cubierta h1 { margin: 14px 0 6px; font: 600 clamp(40px, 9vw, 64px)/.95 var(--f-disp); letter-spacing: .12em; text-transform: uppercase; }
+.cubierta .sub { margin: 0 0 26px; font: 400 16px/1.3 var(--f-doc); color: var(--paper-ink2); }
+.cubierta .sello { position: absolute; right: 26px; top: 26px; }
+#btnIniciar { position: relative; font: 600 20px/1 var(--f-disp); letter-spacing: .14em; text-transform: uppercase; background: var(--paper-ink); color: var(--paper); border: 0; border-radius: 2px; padding: 16px 26px; cursor: pointer; min-width: min(240px, 100%); }
+#btnIniciar:disabled { opacity: .5; cursor: progress; }
+.cubierta .nota { margin: 18px 0 0; font: 400 13px/1.4 var(--f-doc); color: var(--paper-ink2); }
+
+/* laboratorio: dos zonas */
+#labUI { position: absolute; left: 16px; top: calc(14px + env(safe-area-inset-top, 0px)); z-index: 8; max-width: min(380px, calc(100% - 32px)); background: var(--paper); border: 1px solid var(--paper-line); padding: 10px 14px 11px; color: var(--paper-ink); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+#labUI h2 { margin: 3px 0 2px; font: 600 21px/1.1 var(--f-disp); letter-spacing: .1em; text-transform: uppercase; }
+#labUI p.t { margin: 0; font: 400 13px/1.4 var(--f-doc); color: var(--paper-ink2); }
+#labUI[hidden], #ofiUI[hidden] { display: none; }
+.zona { position: absolute; left: 0; top: 0; z-index: 7; display: none; text-align: left; padding: 8px 13px 9px; background: var(--paper); color: var(--paper-ink); border: 1px solid var(--paper-line); border-radius: 2px; box-shadow: 0 8px 22px rgba(0,0,0,.35); cursor: pointer; transition: background .2s, box-shadow .2s; }
+#app.modo-laboratorio .zona { display: grid; gap: 3px; }
+.zona::after { content: ''; position: absolute; left: 50%; top: 100%; width: 1px; height: 8px; background: var(--paper-line); }
+.zona .zt { font: 600 19px/1 var(--f-disp); letter-spacing: .1em; text-transform: uppercase; }
+.zona .zs { font: 400 12.5px/1.2 var(--f-doc); color: var(--paper-ink2); }
+.zona.on { background: var(--paper-2); box-shadow: 0 0 0 2px var(--copper), 0 10px 26px rgba(0,0,0,.4); }
+
+/* oficina */
+#ofiUI { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
+#ofiUI > * { pointer-events: auto; }
+.ofi-h { position: absolute; pointer-events: auto; left: 16px; top: calc(14px + env(safe-area-inset-top, 0px)); display: flex; gap: 10px; align-items: flex-start; max-width: calc(100% - 32px); }
+.ofi-h .doc-card { background: var(--paper); border: 1px solid var(--paper-line); padding: 7px 12px 8px; color: var(--paper-ink); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+.ofi-h h2 { margin: 2px 0 0; font: 600 19px/1.1 var(--f-disp); letter-spacing: .1em; text-transform: uppercase; }
+#papeles { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: min(1040px, calc(100% - 32px)); display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
+#papeles button { display: grid; gap: 2px; text-align: left; background: var(--paper); color: var(--paper-ink); border: 1px solid var(--paper-line); border-radius: 2px; padding: 7px 9px 8px; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,.25); min-height: 44px; }
+#papeles button:hover { background: var(--paper-2); }
+#papeles .pn { font: 400 12px var(--f-doc); color: var(--stamp); letter-spacing: .06em; }
+#papeles .pt { font: 400 12.5px/1.2 var(--f-doc); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#papelTip { position: absolute; left: 0; top: 0; z-index: 7; pointer-events: none; font: 400 15px/1.2 var(--f-doc); color: var(--paper-ink); background: var(--paper); border: 1px solid var(--paper-line); padding: 6px 10px; box-shadow: 0 6px 18px rgba(0,0,0,.35); white-space: nowrap; }
+#papelTip[hidden] { display: none; }
+
+/* dossier de la gráfica */
+#dossier { position: absolute; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; background: var(--shade); padding: 34px 22px 22px; }
+#dossier.open { display: flex; }
+.dos { position: relative; width: min(1180px, 100%); height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--paper); color: var(--paper-ink); border: 1px solid var(--paper-line); box-shadow: 0 30px 80px rgba(0,0,0,.5); animation: aparecer .35s both; }
+.dos::before { content: 'EXPEDIENTE'; position: absolute; left: 22px; top: -25px; height: 25px; box-sizing: border-box; padding: 6px 14px 0; font: 400 11px var(--f-doc); letter-spacing: .14em; color: var(--paper-ink2); background: var(--paper); border: 1px solid var(--paper-line); border-bottom: 0; }
+.dos-h { position: static; pointer-events: auto; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 14px 20px 10px; border-bottom: 1px dashed var(--paper-line); }
+.dos-h h2 { margin: 4px 0 2px; font: 600 26px/1.05 var(--f-disp); letter-spacing: .08em; text-transform: uppercase; }
+.dos-sub { margin: 0; font: 400 13px/1.35 var(--f-doc); color: var(--paper-ink2); }
+.dos-meta { display: flex; align-items: center; gap: 16px; flex: none; }
+.dos-num { font: 400 20px var(--f-doc); letter-spacing: .06em; }
+.dos-body { min-height: 0; background: var(--paper-2); }
+#dosFrame { display: block; width: 100%; height: 100%; border: 0; background: var(--paper-2); }
+.dos-f { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 10px 20px 12px; border-top: 1px dashed var(--paper-line); }
+.dos-f .sp { flex: 1; }
+@media (max-width: 820px) {
+  #papeles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+  #papeles button { padding: 5px 7px 6px; } #papeles .pt { font-size: 11.5px; }
+}
+@media (max-width: 640px) {
+  #dossier { padding: 0; }
+  .dos { border: 0; } .dos::before { display: none; }
+  .dos-h { padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 8px; } .dos-h h2 { font-size: 21px; } .dos-h .sello { display: none; }
+  .dos-f { display: grid; grid-template-columns: 1fr 1fr; padding: 8px 14px calc(10px + env(safe-area-inset-bottom, 0px)); } .dos-f .sp { display: none; }
+  #dosBack { grid-column: 1 / -1; order: 3; }
+  .cubierta { padding: 28px 22px 24px; } .cubierta .sello { right: 16px; top: 16px; font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #app.modo-reactor > header, #app.modo-reactor > #info, .dos { animation: none; }
+  #carga, #cargaBar { transition: none; }
+}
 </style>
 
 </head>
@@ -107,6 +206,7 @@ header > * { pointer-events: auto; }
     <div class="row1">
       <div class="brand"><h1>RESONADOR Ω</h1><p>Proyecto Ω · Instituto Kurchátov · modelo 3D modular</p></div>
       <div class="tools">
+        <button class="tool lab-back" id="btnLab" type="button" title="Volver al laboratorio (Esc)">← Laboratorio</button>
         <button class="tool" id="btnPanel" type="button" aria-pressed="false">Componentes</button>
         <button class="tool" id="btnLabels" type="button" aria-pressed="true">Etiquetas</button>
         <button class="tool" id="btnScale" type="button" aria-pressed="true">Escala</button>
@@ -133,9 +233,58 @@ header > * { pointer-events: auto; }
     </div>
   </aside>
   <div id="toast" hidden role="status"></div>
+  <!-- ===== experiencia ===== -->
+  <section id="labUI" hidden aria-labelledby="labT">
+    <p class="kick">Proyecto Ω · Instituto Kurchátov</p>
+    <h2 id="labT">Laboratorio</h2>
+    <p class="t">Elige una zona: el reactor o la oficina de análisis.</p>
+  </section>
+  <button type="button" class="zona" id="zReactor" aria-label="Ir al reactor Ω"><span class="zt">Reactor Ω</span><span class="zs">Ir al reactor →</span></button>
+  <button type="button" class="zona" id="zOficina" aria-label="Ir a la oficina de análisis"><span class="zt">Oficina de análisis</span><span class="zs">Ir a la oficina →</span></button>
+  <section id="ofiUI" hidden aria-labelledby="ofiT">
+    <div class="ofi-h">
+      <button type="button" class="doc-btn" id="ofiBack" title="Volver al laboratorio (Esc)">← Laboratorio</button>
+      <div class="doc-card"><p class="kick">Archivo de gráficas</p><h2 id="ofiT">Oficina de análisis</h2></div>
+    </div>
+    <nav id="papeles" aria-label="Papeles del escritorio: una gráfica por papel"></nav>
+  </section>
+  <div id="papelTip" hidden aria-hidden="true"></div>
+  <div id="dossier" role="dialog" aria-modal="true" aria-labelledby="dosTitle" hidden>
+    <article class="dos">
+      <header class="dos-h">
+        <div><p class="kick">Archivo · Instituto Kurchátov · Proyecto Ω</p><h2 id="dosTitle"></h2><p class="dos-sub" id="dosSub"></p></div>
+        <div class="dos-meta"><span class="dos-num" id="dosNum"></span><span class="sello" aria-hidden="true">ARCHIVO</span></div>
+      </header>
+      <div class="dos-body"><iframe id="dosFrame" title="Gráfica"></iframe></div>
+      <footer class="dos-f">
+        <button type="button" class="doc-btn" id="dosBack">← Volver al escritorio</button>
+        <span class="sp"></span>
+        <button type="button" class="doc-btn" id="dosPrev">← Anterior</button>
+        <button type="button" class="doc-btn" id="dosNext">Siguiente →</button>
+        <a class="doc-btn" id="dosSolo" href="#" target="_blank" rel="noopener" aria-label="Abrir la gráfica sola en una pestaña nueva">Abrir sola ↗</a>
+      </footer>
+    </article>
+  </div>
+  <section id="portada" hidden aria-labelledby="portT">
+    <div class="cubierta">
+      <p class="kick">Archivo del instituto · Visor 3D</p>
+      <span class="sello" aria-hidden="true">ARCHIVO</span>
+      <h1 id="portT">Resonador Ω</h1>
+      <p class="sub">Proyecto Ω · Instituto Kurchátov</p>
+      <button type="button" id="btnIniciar" disabled>Iniciar experiencia</button>
+      <p class="nota">Recorre el laboratorio: el reactor y la oficina de análisis.</p>
+    </div>
+  </section>
+  <div id="carga" role="progressbar" aria-label="Cargando la escena" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div class="caja"><p class="kick">Proyecto Ω · Instituto Kurchátov</p><h1>RESONADOR Ω</h1><div class="pista"><div id="cargaBar"></div></div><p id="cargaTxt">Cargando Three.js…</p></div>
+  </div>
+  <p id="vivo" class="sr" aria-live="polite"></p>
 </div>
+<script type="application/json" id="graficas-datos">{"composicion_atmosferica_2082_animated.html": "\n<style>\n*{box-sizing:border-box;margin:0;padding:0}\nbody{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}\n.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:720px}\n#chart{width:100%;height:auto;display:block}\n.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}\n.btn{padding:7px 18px;border:0.5px solid var(--border-strong);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--surface-2);color:var(--text-primary);transition:background .12s,transform .12s,box-shadow .12s}\n.btn:hover:not(:disabled){background:var(--surface-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}\n.btn:active:not(:disabled){transform:translateY(0)}\n.btn:disabled{opacity:.3;cursor:not-allowed}\n.btn-primary{background:#3ab4d8;color:#fff;border-color:#3ab4d8}\n.btn-primary:hover:not(:disabled){background:#2fa0c4}\n.pbar{height:2px;background:var(--border);border-radius:99px;margin-top:12px;overflow:hidden}\n.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#0d2240,#b8e9f5);border-radius:99px}\n<\/style>\n\n<div class=\"card\">\n  <svg id=\"chart\" viewBox=\"0 0 720 510\" xmlns=\"http://www.w3.org/2000/svg\"\n    role=\"img\" aria-label=\"Composición atmosférica 2082 — gráfica de torta con cinco componentes\"><\/svg>\n  <div class=\"controls\">\n    <button class=\"btn btn-primary\" id=\"btnPlay\">▶ Reproducir<\/button>\n    <button class=\"btn\" id=\"btnPause\" disabled>⏸ Pausar<\/button>\n    <button class=\"btn\" id=\"btnReset\" disabled>↺ Reiniciar<\/button>\n  <\/div>\n  <div class=\"pbar\"><div class=\"pbar-fill\" id=\"pFill\"><\/div><\/div>\n<\/div>\n\n<script>\n// ── DATA ──────────────────────────────────────────────────────\nconst PIE=[\n  {label:'Aire convencional',    val:48, col:'#b8e9f5', tc:'#1d3f7a', ins:true},\n  {label:'Hydraether suspendido',val:31, col:'#3ab4d8', tc:'#fff',    ins:true},\n  {label:'Vapor de agua',        val:9,  col:'#1d3557', tc:'#fff',    ins:false},\n  {label:'Partículas minerales', val:5,  col:'#8ad4e8', tc:'#333',    ins:false},\n  {label:'Other',                val:7,  col:'#0d2240', tc:'#333',    ins:false},\n];\n// Angles (total=100, so 1 unit = 3.6°)\nlet cum=0;\nPIE.forEach(d=>{d.sa=cum*3.6;d.sw=d.val*3.6;d.ea=d.sa+d.sw;d.ma=d.sa+d.sw/2;cum+=d.val;});\n\n// ── CONSTANTS ─────────────────────────────────────────────────\nconst CX=360,CY=295,R=158,VW=720,VH=510;\nconst ff=\"'Segoe UI',-apple-system,sans-serif\";\nconst dk=()=>document.documentElement.dataset.mode==='dark'||(!document.documentElement.dataset.mode&&matchMedia('(prefers-color-scheme:dark)').matches);\nconst tc =()=>dk()?'#f0efec':'#111';\nconst tc2=()=>dk()?'#c3c2b7':'#555';\nconst otc=()=>dk()?'#d0cfca':'#222'; // outside-label text color\n\n// ── SVG HELPERS ───────────────────────────────────────────────\nconst NS='http://www.w3.org/2000/svg';\nconst mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};\nconst mkt=(s,a,p)=>{const e=mk('text',a,p);e.textContent=String(s);return e;};\n\nfunction pxy(ang,r=R){\n  const rad=(ang-90)*Math.PI/180;\n  return[+(CX+r*Math.cos(rad)).toFixed(2),+(CY+r*Math.sin(rad)).toFixed(2)];\n}\n\nfunction slicePath(sa,ea){\n  if(ea<=sa+0.02)return`M${CX},${CY}`;\n  const sw=ea-sa;\n  if(sw>=359.97){\n    const[tx,ty]=pxy(sa),[mx,my]=pxy(sa+180);\n    return`M${CX},${CY}L${tx},${ty}A${R},${R},0,0,1,${mx},${my}A${R},${R},0,0,1,${tx},${ty}Z`;\n  }\n  const[sx,sy]=pxy(sa),[ex,ey]=pxy(ea);\n  return`M${CX},${CY}L${sx},${sy}A${R},${R},0,${sw>180?1:0},1,${ex},${ey}Z`;\n}\n\n// ── BUILD SVG ─────────────────────────────────────────────────\nconst svg=document.getElementById('chart');\nmk('rect',{x:0,y:0,width:VW,height:VH,fill:'transparent'},svg);\n\n// Title\nconst titleEl=mkt('Composición atmosférica 2082',{\n  x:16,y:30,'font-size':21,'font-weight':700,\n  fill:tc(),opacity:0,'font-family':ff,'letter-spacing':'-0.3'\n},svg);\n\n// Legend — 2 rows\nconst lgG=mk('g',{opacity:0},svg);\nconst LG=[\n  {i:0,x:16, y:48},{i:1,x:130,y:48},{i:2,x:280,y:48},\n  {i:3,x:16, y:68},{i:4,x:154,y:68},\n];\nLG.forEach(({i,x,y})=>{\n  mk('rect',{x,y,width:12,height:12,fill:PIE[i].col,rx:2},lgG);\n  mkt(PIE[i].label,{x:x+17,y:y+9.5,'font-size':9.5,fill:tc2(),'font-family':ff},lgG);\n});\n\n// ── PIE SEGMENTS + LABELS ─────────────────────────────────────\nconst segs=[];\nPIE.forEach((d,i)=>{\n  // Path (drawn above legend, below labels)\n  const path=mk('path',{fill:d.col,stroke:'#fff','stroke-width':1.8,'stroke-linejoin':'round'},svg);\n  path.setAttribute('d',`M${CX},${CY}`);\n\n  // Label group\n  const[lx,ly]=pxy(d.ma, d.ins ? R*0.60 : R*1.28);\n  const anchor=d.ins?'middle':(lx<CX?'end':'start');\n  const fill=d.ins?d.tc:otc();\n\n  const lg=mk('g',{opacity:0},svg);\n  // Short leader line for outside labels\n  if(!d.ins){\n    const[ax,ay]=pxy(d.ma,R+4);\n    const[bx,by]=pxy(d.ma,R*1.18);\n    mk('line',{x1:ax,y1:ay,x2:bx,y2:by,stroke:dk()?'#666':'#bbb','stroke-width':1},lg);\n  }\n  // Name\n  mkt(d.label,{x:lx,y:ly,'text-anchor':anchor,'dominant-baseline':'auto',\n    'font-size':10.5,'font-weight':700,fill,'font-family':ff},lg);\n  // Value\n  mkt(d.val,{x:lx,y:ly+15,'text-anchor':anchor,\n    'font-size':13,'font-weight':700,fill,'font-family':ff},lg);\n\n  segs.push({path,lg});\n});\n\n// Credit\nmkt('Creado con Datawrapper',{x:16,y:500,'font-size':10,fill:dk()?'#555':'#bbb','font-family':ff},svg);\n\n// ── EASING ────────────────────────────────────────────────────\nconst eExp  =t=>t>=1?1:1-Math.pow(2,-10*t);\nconst eCubic=t=>1-Math.pow(1-t,3);\nconst clamp =(v,a=0,b=1)=>Math.min(Math.max(v,a),b);\nconst pt    =(e,s,d)=>clamp((e-s)/d);\n\n// Proportional durations: large slices sweep slower\nPIE.forEach(d=>{d.dur=400+(d.sw/360)*720;});\nconst T0=380,STG=275;\nconst TOTAL=T0+(PIE.length-1)*STG+PIE[PIE.length-1].dur+350;\n\n// ── UPDATE ────────────────────────────────────────────────────\nfunction update(e){\n  titleEl.setAttribute('opacity',eCubic(pt(e,0,320)));\n  lgG.setAttribute('opacity',    eCubic(pt(e,120,300)));\n\n  PIE.forEach((d,i)=>{\n    const t=eExp(pt(e,T0+i*STG,d.dur));\n    segs[i].path.setAttribute('d',slicePath(d.sa, d.sa+d.sw*t));\n    segs[i].lg.setAttribute('opacity',eCubic(clamp((t-0.72)/0.28)));\n  });\n  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';\n}\n\n// ── STATE ─────────────────────────────────────────────────────\nlet segStart=null,acc=0,state='idle',raf=null;\nconst btnPlay=document.getElementById('btnPlay');\nconst btnPause=document.getElementById('btnPause');\nconst btnReset=document.getElementById('btnReset');\n\nfunction sync(){\n  btnPause.disabled=state!=='playing';\n  btnReset.disabled=state==='idle';\n  btnPlay.disabled=state==='playing';\n  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';\n}\nfunction play(){\n  segStart=performance.now();state='playing';sync();\n  (function loop(){\n    if(state!=='playing')return;\n    const e=acc+(performance.now()-segStart);\n    update(e);\n    if(e>=TOTAL){update(TOTAL);state='done';sync();}\n    else raf=requestAnimationFrame(loop);\n  })();\n}\nfunction pause(){cancelAnimationFrame(raf);acc+=performance.now()-segStart;segStart=null;state='paused';sync();}\nfunction reset(){\n  cancelAnimationFrame(raf);acc=0;segStart=null;state='idle';\n  titleEl.setAttribute('opacity',0);lgG.setAttribute('opacity',0);\n  segs.forEach(s=>{s.path.setAttribute('d',`M${CX},${CY}`);s.lg.setAttribute('opacity',0);});\n  document.getElementById('pFill').style.width='0%';sync();\n}\nbtnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});\nbtnPause.addEventListener('click',pause);\nbtnReset.addEventListener('click',reset);\nsync();\n<\/script>\n", "concentracion_hae_mapa_mundial_v2.html": "\n<style>\n*{box-sizing:border-box;margin:0;padding:0}\nbody{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}\n.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:720px}\n#chart{width:100%;height:auto;display:block}\n.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}\n.btn{padding:7px 18px;border:0.5px solid var(--border-strong);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--surface-2);color:var(--text-primary);transition:background .12s,transform .12s,box-shadow .12s}\n.btn:hover:not(:disabled){background:var(--surface-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}\n.btn:active:not(:disabled){transform:translateY(0)}\n.btn:disabled{opacity:.3;cursor:not-allowed}\n.btn-primary{background:#1d3f7a;color:#fff;border-color:#1d3f7a}\n.btn-primary:hover:not(:disabled){background:#254d96}\n.pbar{height:2px;background:var(--border);border-radius:99px;margin-top:12px;overflow:hidden}\n.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#b8e9f5,#0d2240);border-radius:99px}\n<\/style>\n\n<div class=\"card\">\n  <svg id=\"chart\" viewBox=\"0 0 720 440\" xmlns=\"http://www.w3.org/2000/svg\"\n    role=\"img\" aria-label=\"Concentración HAE por sector — mapa mundial autocontenido\"><\/svg>\n  <div class=\"controls\">\n    <button class=\"btn btn-primary\" id=\"btnPlay\">▶ Reproducir<\/button>\n    <button class=\"btn\" id=\"btnPause\" disabled>⏸ Pausar<\/button>\n    <button class=\"btn\" id=\"btnReset\" disabled>↺ Reiniciar<\/button>\n  <\/div>\n  <div class=\"pbar\"><div class=\"pbar-fill\" id=\"pFill\"><\/div><\/div>\n<\/div>\n\n<script>\n// ══ MAPA AUTOCONTENIDO — sin D3, sin fetch, sin CDN ══════════\n// Proyección: Equirectangular (Plate Carrée)\n// Área del mapa: x 0..720, y 50..440 (390 px de alto)\n\nconst VW=720,VH=440;\nconst ff=\"'Segoe UI',-apple-system,sans-serif\";\nconst ISD=document.documentElement.dataset.mode==='dark'||\n  (!document.documentElement.dataset.mode&&matchMedia('(prefers-color-scheme:dark)').matches);\nconst TC =ISD?'#f0efec':'#111';\nconst TC2=ISD?'#898781':'#999';\n\n// Proyección: (lng,lat) → (x,y) SVG\nconst p2s=(lng,lat)=>[+(720*(lng+180)/360).toFixed(1),+(50+390*(90-lat)/180).toFixed(1)];\n\n// ── BURBUJAS (orden oeste → este) ─────────────────────────────\nconst BUBBLES=[\n  {lat:5,  lng:-155,val:49},\n  {lat:12, lng:-65, val:27},\n  {lat:-20,lng:-52, val:12},\n  {lat:50, lng:3,   val:34},\n  {lat:4,  lng:23,  val:44},\n  {lat:48, lng:68,  val:13},\n  {lat:22, lng:78,  val:51},\n  {lat:-27,lng:133, val:18},\n];\nconst colorFn=v=>{const t=(v-12)/39;return`rgb(${Math.round(184-171*t)},${Math.round(233-199*t)},${Math.round(245-181*t)})`;};\nconst rFn=v=>10+(v-12)/39*24;\n\n// ── POLÍGONOS DE CONTINENTES (pre-calculados, equirectangular) ─\nconst POLYS=[\n  // América del Norte\n  \"24,104 80,89 190,87 240,65 256,115 250,141 240,150 220,156 208,172 200,193 184,210 176,210 166,200 140,195 126,178 112,140 90,124 80,115\",\n  // América del Sur\n  \"204,223 240,219 260,241 288,256 284,275 276,295 270,301 264,306 254,317 246,327 228,366 216,353 208,340 200,319 200,267\",\n  // Europa\n  \"340,167 350,167 360,152 366,137 364,135 372,128 380,126 390,122 396,115 410,104 416,93 400,93 390,93 380,109 370,119 360,135 354,137 350,141 344,152\",\n  // África\n  \"326,210 360,223 390,234 400,321 430,299 444,271 460,219 450,213 440,202 424,176 410,176 380,163 350,169 340,176 330,184 326,202\",\n  // Asia (incluyendo subcontinente indio y SE asiático)\n  \"420,163 430,165 450,158 460,148 480,163 510,169 520,176 540,197 560,206 570,219 580,234 600,256 620,262 630,256 640,245 670,223 690,115 696,104 670,89 560,89 520,87 460,93 440,89 420,98 410,115 416,126\",\n  // Australia\n  \"588,293 596,288 620,271 634,278 650,284 660,293 668,299 666,310 666,327 654,332 648,327 636,319 620,317 604,319 588,310 584,299\",\n  // Groenlandia\n  \"256,115 270,104 300,93 320,87 310,78 290,72 270,67 244,65 230,76 224,89 236,104\",\n  // Japón\n  \"620,178 626,171 630,167 640,158 642,156 642,152 640,150 636,152 630,163 626,169\",\n  // Reino Unido (aproximado)\n  \"354,137 360,135 364,132 360,127 350,124 344,131 350,137\"\n];\n\n// ── SVG ───────────────────────────────────────────────────────\nconst NS='http://www.w3.org/2000/svg';\nconst mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};\nconst mkt=(s,a,p)=>{const e=mk('text',a,p);e.textContent=String(s);return e;};\n\nconst svg=document.getElementById('chart');\n\n// Fondo oceánico\nmk('rect',{x:0,y:0,width:VW,height:VH,fill:ISD?'#0d1520':'#c8e8f4'},svg);\n\n// Continentes\nconst ctF=ISD?'#3a3a38':'#d0d0cc', ctB=ISD?'#222':'#fff';\nPOLYS.forEach(pts=>mk('polygon',{points:pts,fill:ctF,stroke:ctB,'stroke-width':0.5},svg));\n\n// Ecuador (línea de referencia punteada)\nmk('line',{x1:0,y1:245,x2:720,y2:245,stroke:ISD?'#1e2535':'#aad4e8','stroke-width':0.5,'stroke-dasharray':'4,4'},svg);\n\n// Título\nconst titleEl=mkt('Concentración HAE por sector',{\n  x:15,y:22,'font-size':20,'font-weight':700,fill:TC,opacity:0,'font-family':ff,'letter-spacing':'-0.3'\n},svg);\n\n// Leyenda de escala\nconst defs=mk('defs',{},svg);\nconst grad=mk('linearGradient',{id:'hG',x1:'0%',y1:'0%',x2:'100%',y2:'0%'},defs);\nmk('stop',{'offset':'0%','stop-color':colorFn(12)},grad);\nmk('stop',{'offset':'100%','stop-color':colorFn(51)},grad);\n\nconst lgG=mk('g',{opacity:0},svg);\nmkt('%VOL/VOL',{x:16,y:VH-50,'font-size':9,fill:TC2,'font-family':ff},lgG);\nmk('rect',{x:16,y:VH-42,width:110,height:8,fill:'url(#hG)',rx:2},lgG);\nmkt('12%',{x:16,y:VH-27,'font-size':9,fill:TC2,'font-family':ff},lgG);\nmkt('51%',{x:126,y:VH-27,'font-size':9,'text-anchor':'end',fill:TC2,'font-family':ff},lgG);\nmkt('Creado con Datawrapper',{x:VW-16,y:VH-10,'text-anchor':'end','font-size':10,fill:TC2,'font-family':ff},svg);\n\n// Burbujas\nconst bubblesG=mk('g',{},svg);\nBUBBLES.forEach(b=>{\n  const[cx,cy]=p2s(b.lng,b.lat);\n  b.cx=cx;b.cy=cy;b.maxR=rFn(b.val);b.col=colorFn(b.val);\n  b.elem=mk('circle',{cx,cy,r:0,fill:b.col,opacity:0,stroke:'rgba(255,255,255,0.65)','stroke-width':1.5},bubblesG);\n});\n\n// ── ANIMACIÓN ─────────────────────────────────────────────────\nconst eCubic=t=>1-Math.pow(1-t,3);\nconst eBack =t=>{const c1=1.70158,c3=c1+1;return t>=1?1:1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);};\nconst clamp =(v,a=0,b=1)=>Math.min(Math.max(v,a),b);\nconst pt    =(e,s,d)=>clamp((e-s)/d);\n\nconst T0=340,BD=460,BS=240;\nconst TOTAL=T0+(BUBBLES.length-1)*BS+BD+380;\n\nfunction update(e){\n  titleEl.setAttribute('opacity',eCubic(pt(e,0,320)));\n  lgG.setAttribute('opacity',    eCubic(pt(e,110,300)));\n  BUBBLES.forEach((b,i)=>{\n    const tt=eBack(pt(e,T0+i*BS,BD));\n    b.elem.setAttribute('r',+(b.maxR*Math.max(tt,0)).toFixed(1));\n    b.elem.setAttribute('opacity',+clamp(tt*1.8).toFixed(2));\n  });\n  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';\n}\n\n// ── ESTADO ────────────────────────────────────────────────────\nlet segStart=null,acc=0,state='idle',raf=null;\nconst btnPlay=document.getElementById('btnPlay');\nconst btnPause=document.getElementById('btnPause');\nconst btnReset=document.getElementById('btnReset');\nfunction sync(){\n  btnPause.disabled=state!=='playing';\n  btnReset.disabled=state==='idle';\n  btnPlay.disabled=state==='playing';\n  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';\n}\nfunction play(){\n  segStart=performance.now();state='playing';sync();\n  (function loop(){\n    if(state!=='playing')return;\n    const e=acc+(performance.now()-segStart);\n    update(e);\n    if(e>=TOTAL){update(TOTAL);state='done';sync();}\n    else raf=requestAnimationFrame(loop);\n  })();\n}\nfunction pause(){cancelAnimationFrame(raf);acc+=performance.now()-segStart;segStart=null;state='paused';sync();}\nfunction reset(){\n  cancelAnimationFrame(raf);acc=0;segStart=null;state='idle';\n  titleEl.setAttribute('opacity',0);lgG.setAttribute('opacity',0);\n  BUBBLES.forEach(b=>{b.elem.setAttribute('r',0);b.elem.setAttribute('opacity',0);});\n  document.getElementById('pFill').style.width='0%';sync();\n}\nbtnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});\nbtnPause.addEventListener('click',pause);\nbtnReset.addEventListener('click',reset);\nsync();\n<\/script>\n", "concentracion_hydraether_1986_2082_animated.html": "\n<style>\n*{box-sizing:border-box;margin:0;padding:0}\nbody{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}\n.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:720px}\n#chart{width:100%;height:auto;display:block}\n.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}\n.btn{padding:7px 18px;border:0.5px solid var(--border-strong);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--surface-2);color:var(--text-primary);transition:background .12s,transform .12s,box-shadow .12s}\n.btn:hover:not(:disabled){background:var(--surface-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}\n.btn:active:not(:disabled){transform:translateY(0)}\n.btn:disabled{opacity:.3;cursor:not-allowed}\n.btn-primary{background:#3ab4d8;color:#fff;border-color:#3ab4d8}\n.btn-primary:hover:not(:disabled){background:#2fa0c4}\n.pbar{height:2px;background:var(--border);border-radius:99px;margin-top:12px;overflow:hidden}\n.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#1d3557,#3ab4d8,#b8e9f5);border-radius:99px}\n<\/style>\n\n<div class=\"card\">\n  <svg id=\"chart\" viewBox=\"0 0 720 490\" xmlns=\"http://www.w3.org/2000/svg\"\n    role=\"img\" aria-label=\"Concentración de Hydraether 1986 a 2082 — curva sigmoidea\"><\/svg>\n  <div class=\"controls\">\n    <button class=\"btn btn-primary\" id=\"btnPlay\">▶ Reproducir<\/button>\n    <button class=\"btn\" id=\"btnPause\" disabled>⏸ Pausar<\/button>\n    <button class=\"btn\" id=\"btnReset\" disabled>↺ Reiniciar<\/button>\n  <\/div>\n  <div class=\"pbar\"><div class=\"pbar-fill\" id=\"pFill\"><\/div><\/div>\n<\/div>\n\n<script>\n// ── LAYOUT ────────────────────────────────────────────────────\nconst pL=58,pR=172,pT=75,pB=55;\nconst cW=490,cH=360,VW=720,VH=490;\nconst X_MIN=1984,X_MAX=2086,Y_MIN=0,Y_MAX=38;\n\nconst xPx=yr=>pL+(yr-X_MIN)*cW/(X_MAX-X_MIN);\nconst yPx=v=> pT+(Y_MAX-v) *cH/(Y_MAX-Y_MIN);\n\n// ── SIGMOID ───────────────────────────────────────────────────\n// k=0.1271, t0=2033.5, L=36 — calibrated from original\nconst sig=yr=>36/(1+Math.exp(-0.1271*(yr-2033.5)));\n\n// ── THEME ─────────────────────────────────────────────────────\nconst ff=\"'Segoe UI',-apple-system,sans-serif\";\nconst dk=()=>document.documentElement.dataset.mode==='dark'||(!document.documentElement.dataset.mode&&matchMedia('(prefers-color-scheme:dark)').matches);\nconst txc =()=>dk()?'#f0efec':'#111';\nconst txc2=()=>dk()?'#898781':'#999';\nconst gclr=()=>dk()?'#2c2c2a':'#e8e8e8';\nconst aclr=()=>dk()?'#444':'#333';\n\n// ── SVG HELPERS ───────────────────────────────────────────────\nconst NS='http://www.w3.org/2000/svg';\nconst mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};\nconst mkt=(s,a,p)=>{const e=mk('text',a,p);e.textContent=String(s);return e;};\n\nconst svg=document.getElementById('chart');\nmk('rect',{x:0,y:0,width:VW,height:VH,fill:'transparent'},svg);\n\n// ── TITLE ─────────────────────────────────────────────────────\nconst titleEl=mkt('Concentración de Hydraether 1986\\u20132082',{\n  x:pL,y:30,'font-size':21,'font-weight':700,\n  fill:txc(),opacity:0,'font-family':ff,'letter-spacing':'-0.3'\n},svg);\n\n// ── GRID ──────────────────────────────────────────────────────\nconst gridG=mk('g',{opacity:0},svg);\n\n// Horizontal gridlines + Y labels\n[0,5,10,15,20,25,30,35].forEach(v=>{\n  const y=+yPx(v).toFixed(1);\n  mk('line',{x1:pL,y1:y,x2:pL+cW,y2:y,\n    stroke:v===0?aclr():gclr(),'stroke-width':1},gridG);\n  mkt(v,{x:pL-7,y,'text-anchor':'end','dominant-baseline':'middle',\n    'font-size':10.5,fill:txc2(),'font-family':ff},gridG);\n});\n\n// X-axis labels\n[1990,2000,2010,2020,2030,2040,2050,2060,2070,2080].forEach(yr=>{\n  mkt(yr,{x:+xPx(yr).toFixed(1),y:pT+cH+16,'text-anchor':'middle',\n    'font-size':10.5,fill:txc2(),'font-family':ff},gridG);\n});\n\n// ── GENERATE LINE DATA ────────────────────────────────────────\nconst PTS=[];\nfor(let yr=1986;yr<=2082;yr++){\n  PTS.push([+xPx(yr).toFixed(2), +yPx(sig(yr)).toFixed(2)]);\n}\n\n// Manual path length (sum of Euclidean distances)\nlet TL=0;\nfor(let i=1;i<PTS.length;i++) TL+=Math.hypot(PTS[i][0]-PTS[i-1][0],PTS[i][1]-PTS[i-1][1]);\nTL=+(TL*1.01).toFixed(2); // 1% buffer\n\n// Path d attribute\nconst PD='M'+PTS[0][0]+','+PTS[0][1]+PTS.slice(1).map(p=>'L'+p[0]+','+p[1]).join('');\n\n// Line element (initially hidden via dashoffset)\nconst lineEl=mk('path',{\n  d:PD,fill:'none',stroke:'#3ab4d8','stroke-width':2.5,\n  'stroke-linecap':'round','stroke-linejoin':'round',\n  'stroke-dasharray':TL,'stroke-dashoffset':TL\n},svg);\n\n// End-of-line label\nconst endX=+(PTS[PTS.length-1][0]+10).toFixed(1);\nconst endY=PTS[PTS.length-1][1];\nconst labelEl=mkt('Concentración_HAE_porcentaje',{\n  x:endX,y:endY,'dominant-baseline':'middle',\n  'font-size':9.5,fill:dk()?'#5bc8e0':'#3ab4d8',\n  opacity:0,'font-family':ff\n},svg);\n\n// Credit\nmkt('Creado con Datawrapper',{\n  x:pL,y:VH-12,'font-size':10,fill:txc2(),'font-family':ff\n},svg);\n\n// ── EASING ────────────────────────────────────────────────────\nconst eCubic=t=>1-Math.pow(1-t,3);\nconst eSin  =t=>-(Math.cos(Math.PI*t)-1)/2;\nconst clamp =(v,a=0,b=1)=>Math.min(Math.max(v,a),b);\nconst pt    =(e,s,d)=>clamp((e-s)/d);\n\n// ── TIMING ────────────────────────────────────────────────────\nconst T0=380,LINE_DUR=2650,TOTAL=T0+LINE_DUR+380;\n\n// ── UPDATE ────────────────────────────────────────────────────\nfunction update(e){\n  titleEl.setAttribute('opacity',eCubic(pt(e,0,340)));\n  gridG.setAttribute('opacity',  eCubic(pt(e,140,360)));\n\n  const lineT=eSin(pt(e,T0,LINE_DUR));\n  lineEl.setAttribute('stroke-dashoffset',+(TL*(1-lineT)).toFixed(2));\n\n  // Label appears when line is >88% drawn\n  labelEl.setAttribute('opacity',eCubic(clamp((lineT-0.88)/0.12)));\n\n  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';\n}\n\n// ── STATE MACHINE ─────────────────────────────────────────────\nlet segStart=null,acc=0,state='idle',raf=null;\nconst btnPlay=document.getElementById('btnPlay');\nconst btnPause=document.getElementById('btnPause');\nconst btnReset=document.getElementById('btnReset');\n\nfunction sync(){\n  btnPause.disabled=state!=='playing';\n  btnReset.disabled=state==='idle';\n  btnPlay.disabled=state==='playing';\n  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';\n}\nfunction play(){\n  segStart=performance.now();state='playing';sync();\n  (function loop(){\n    if(state!=='playing')return;\n    const e=acc+(performance.now()-segStart);\n    update(e);\n    if(e>=TOTAL){update(TOTAL);state='done';sync();}\n    else raf=requestAnimationFrame(loop);\n  })();\n}\nfunction pause(){cancelAnimationFrame(raf);acc+=performance.now()-segStart;segStart=null;state='paused';sync();}\nfunction reset(){\n  cancelAnimationFrame(raf);acc=0;segStart=null;state='idle';\n  titleEl.setAttribute('opacity',0);\n  gridG.setAttribute('opacity',0);\n  lineEl.setAttribute('stroke-dashoffset',TL);\n  labelEl.setAttribute('opacity',0);\n  document.getElementById('pFill').style.width='0%';\n  sync();\n}\nbtnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});\nbtnPause.addEventListener('click',pause);\nbtnReset.addEventListener('click',reset);\nsync();\n<\/script>\n", "evolucion_homo_sapiens_homo_aeris_animated.html": "\n<style>\n*{box-sizing:border-box;margin:0;padding:0}\nbody{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}\n.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:720px}\n#chart{width:100%;height:auto;display:block}\n.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}\n.btn{padding:7px 18px;border:0.5px solid var(--border-strong);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--surface-2);color:var(--text-primary);transition:background .12s,transform .12s,box-shadow .12s}\n.btn:hover:not(:disabled){background:var(--surface-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}\n.btn:active:not(:disabled){transform:translateY(0)}\n.btn:disabled{opacity:.3;cursor:not-allowed}\n.btn-primary{background:#1d3f7a;color:#fff;border-color:#1d3f7a}\n.btn-primary:hover:not(:disabled){background:#254d96}\n.pbar{height:2px;background:var(--border);border-radius:99px;margin-top:12px;overflow:hidden}\n.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#1d3557,#5bc8e0);border-radius:99px}\n<\/style>\n\n<div class=\"card\">\n  <svg id=\"chart\" viewBox=\"0 0 720 478\" xmlns=\"http://www.w3.org/2000/svg\"\n    role=\"img\" aria-label=\"Evolución Homo sapiens y Homo Aeris de 1986 a 2082 — doble curva sigmoide en X\"><\/svg>\n  <div class=\"controls\">\n    <button class=\"btn btn-primary\" id=\"btnPlay\">▶ Reproducir<\/button>\n    <button class=\"btn\" id=\"btnPause\" disabled>⏸ Pausar<\/button>\n    <button class=\"btn\" id=\"btnReset\" disabled>↺ Reiniciar<\/button>\n  <\/div>\n  <div class=\"pbar\"><div class=\"pbar-fill\" id=\"pFill\"><\/div><\/div>\n<\/div>\n\n<script>\n// ── MODELO SIGMOIDE ───────────────────────────────────────────\n// k=0.10, t0=2046 — calibrado para cruce ~2048 a ~47%\nconst Ls=yr=>1/(1+Math.exp(-0.10*(yr-2046)));\nconst aeris  =yr=>89*Ls(yr);\nconst sapiens=yr=>100-88*Ls(yr);\n\n// ── LAYOUT ────────────────────────────────────────────────────\nconst pL=55,pR=188,pT=72,pB=48;\nconst cW=477,cH=358,VW=720,VH=478;\nconst X_MIN=1984,X_MAX=2086;\nconst xPx=yr=>pL+(yr-X_MIN)*cW/(X_MAX-X_MIN);\nconst yPx=v =>pT+(100-v)*cH/100;\n\nconst ff=\"'Segoe UI',-apple-system,sans-serif\";\nconst ISD=document.documentElement.dataset.mode==='dark'||(!document.documentElement.dataset.mode&&matchMedia('(prefers-color-scheme:dark)').matches);\nconst TC =ISD?'#f0efec':'#111';\nconst TC2=ISD?'#898781':'#999';\nconst GC =ISD?'#2c2c2a':'#e8e8e8';\nconst AC =ISD?'#444'   :'#333';\n\nconst NS='http://www.w3.org/2000/svg';\nconst mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};\nconst mkt=(s,a,p)=>{const e=mk('text',a,p);e.textContent=String(s);return e;};\n\nconst svg=document.getElementById('chart');\nmk('rect',{x:0,y:0,width:VW,height:VH,fill:'transparent'},svg);\n\n// Título\nconst titleEl=mkt('Evolución Homo sapiens / Homo Aeris',{\n  x:pL,y:30,'font-size':21,'font-weight':700,\n  fill:TC,opacity:0,'font-family':ff,'letter-spacing':'-0.3'\n},svg);\n\n// Grid\nconst gridG=mk('g',{opacity:0},svg);\n[0,10,20,30,40,50,60,70,80,90,100].forEach(v=>{\n  const y=+yPx(v).toFixed(1);\n  mk('line',{x1:pL,y1:y,x2:pL+cW,y2:y,stroke:v===0?AC:GC,'stroke-width':1},gridG);\n  mkt(v,{x:pL-7,y,'text-anchor':'end','dominant-baseline':'middle','font-size':10.5,fill:TC2,'font-family':ff},gridG);\n});\n[1990,2000,2010,2020,2030,2040,2050,2060,2070,2080].forEach(yr=>{\n  mkt(yr,{x:+xPx(yr).toFixed(1),y:pT+cH+16,'text-anchor':'middle','font-size':10.5,fill:TC2,'font-family':ff},gridG);\n});\nmk('line',{x1:pL,y1:pT,x2:pL,y2:pT+cH,stroke:AC,'stroke-width':0.8},gridG);\n\n// ── PATHS ─────────────────────────────────────────────────────\nfunction genPts(fn){\n  const p=[];\n  for(let yr=1986;yr<=2082;yr++) p.push([+xPx(yr).toFixed(2),+yPx(fn(yr)).toFixed(2)]);\n  return p;\n}\nfunction pLen(pts){let l=0;for(let i=1;i<pts.length;i++)l+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);return l;}\nfunction toD(pts){return'M'+pts[0][0]+','+pts[0][1]+pts.slice(1).map(p=>'L'+p[0]+','+p[1]).join('');}\n\nconst ptA=genPts(aeris),ptS=genPts(sapiens);\nconst TLA=+(pLen(ptA)*1.01).toFixed(2),TLS=+(pLen(ptS)*1.01).toFixed(2);\n\nfunction mkLine(d,TL,col){\n  return mk('path',{d,fill:'none',stroke:col,'stroke-width':2.5,\n    'stroke-linecap':'round','stroke-linejoin':'round',\n    'stroke-dasharray':TL,'stroke-dashoffset':TL},svg);\n}\nconst lineA=mkLine(toD(ptA),TLA,ISD?'#7ab3e8':'#1d3557');\nconst lineS=mkLine(toD(ptS),TLS,'#5bc8e0');\n\n// Etiquetas al final de cada línea\nconst eX=+(ptA[ptA.length-1][0]+12).toFixed(1);\nconst CA=ISD?'#7ab3e8':'#1d3557';\nconst labelA=mkt('Homo_Aeris_porcentaje', {x:eX,y:ptA[ptA.length-1][1],'dominant-baseline':'middle','font-size':9.5,fill:CA,   opacity:0,'font-family':ff},svg);\nconst labelS=mkt('Homo_sapiens_porcentaje',{x:eX,y:ptS[ptS.length-1][1],'dominant-baseline':'middle','font-size':9.5,fill:'#5bc8e0',opacity:0,'font-family':ff},svg);\n\nmkt('Creado con Datawrapper',{x:pL,y:VH-12,'font-size':10,fill:TC2,'font-family':ff},svg);\n\n// ── EASING ────────────────────────────────────────────────────\nconst eCubic=t=>1-Math.pow(1-t,3);\nconst eSin  =t=>-(Math.cos(Math.PI*t)-1)/2;\nconst clamp =(v,a=0,b=1)=>Math.min(Math.max(v,a),b);\nconst pt    =(e,s,d)=>clamp((e-s)/d);\n\nconst T0=380,LD=2700,TOTAL=T0+LD+380;\n\nfunction update(e){\n  titleEl.setAttribute('opacity',eCubic(pt(e,0,340)));\n  gridG.setAttribute('opacity',  eCubic(pt(e,140,360)));\n  const lt=eSin(pt(e,T0,LD));\n  lineA.setAttribute('stroke-dashoffset',+(TLA*(1-lt)).toFixed(2));\n  lineS.setAttribute('stroke-dashoffset',+(TLS*(1-lt)).toFixed(2));\n  const lab=eCubic(clamp((lt-0.88)/0.12));\n  labelA.setAttribute('opacity',lab);\n  labelS.setAttribute('opacity',lab);\n  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';\n}\n\n// ── ESTADO ────────────────────────────────────────────────────\nlet segStart=null,acc=0,state='idle',raf=null;\nconst btnPlay=document.getElementById('btnPlay');\nconst btnPause=document.getElementById('btnPause');\nconst btnReset=document.getElementById('btnReset');\nfunction sync(){\n  btnPause.disabled=state!=='playing';\n  btnReset.disabled=state==='idle';\n  btnPlay.disabled=state==='playing';\n  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';\n}\nfunction play(){\n  segStart=performance.now();state='playing';sync();\n  (function loop(){\n    if(state!=='playing')return;\n    const e=acc+(performance.now()-segStart);\n    update(e);\n    if(e>=TOTAL){update(TOTAL);state='done';sync();}\n    else raf=requestAnimationFrame(loop);\n  })();\n}\nfunction pause(){cancelAnimationFrame(raf);acc+=performance.now()-segStart;segStart=null;state='paused';sync();}\nfunction reset(){\n  cancelAnimationFrame(raf);acc=0;segStart=null;state='idle';\n  titleEl.setAttribute('opacity',0);gridG.setAttribute('opacity',0);\n  lineA.setAttribute('stroke-dashoffset',TLA);lineS.setAttribute('stroke-dashoffset',TLS);\n  labelA.setAttribute('opacity',0);labelS.setAttribute('opacity',0);\n  document.getElementById('pFill').style.width='0%';sync();\n}\nbtnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});\nbtnPause.addEventListener('click',pause);\nbtnReset.addEventListener('click',reset);\nsync();\n<\/script>\n", "indice_adaptacion_biologica_animated.html": "\n<style>\n*{box-sizing:border-box;margin:0;padding:0}\nbody{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}\n.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:720px}\n#chart{width:100%;height:auto;display:block}\n.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}\n.btn{padding:7px 18px;border:0.5px solid var(--border-strong);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--surface-2);color:var(--text-primary);transition:background .12s,transform .12s,box-shadow .12s}\n.btn:hover:not(:disabled){background:var(--surface-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}\n.btn:active:not(:disabled){transform:translateY(0)}\n.btn:disabled{opacity:.3;cursor:not-allowed}\n.btn-primary{background:#1d3f7a;color:#fff;border-color:#1d3f7a}\n.btn-primary:hover:not(:disabled){background:#254d96}\n.pbar{height:2px;background:var(--border);border-radius:99px;margin-top:12px;overflow:hidden}\n.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#0d2240,#b0e4f5);border-radius:99px}\n<\/style>\n\n<div class=\"card\">\n  <svg id=\"chart\" viewBox=\"0 0 720 545\" xmlns=\"http://www.w3.org/2000/svg\"\n    role=\"img\" aria-label=\"Índice de adaptación biológica comparado entre Homo sapiens, Homo Aeris, Skywhales y Leviatanes\"><\/svg>\n  <div class=\"controls\">\n    <button class=\"btn btn-primary\" id=\"btnPlay\">▶ Reproducir<\/button>\n    <button class=\"btn\" id=\"btnPause\" disabled>⏸ Pausar<\/button>\n    <button class=\"btn\" id=\"btnReset\" disabled>↺ Reiniciar<\/button>\n  <\/div>\n  <div class=\"pbar\"><div class=\"pbar-fill\" id=\"pFill\"><\/div><\/div>\n<\/div>\n\n<script>\nconst DATA=[\n  {label:'Homo sapiens', vals:[18,12,15,10,14]},\n  {label:'Homo Aeris',   vals:[91,78,84,88,85.25]},\n  {label:'Skywhales',    vals:[96,94,89,92,92.75]},\n  {label:'Leviatanes',   vals:[99,97,96,98,97.5]},\n];\nconst COLORS=['#b0e4f5','#3ab4d8','#1d3f7a','#5bc8e0','#0d2240'];\nconst KEYS=['Adaptación_pulmonar','Adaptación_dermal','Adaptación_metabólica','Adaptación_sensorial','Índice_promedio'];\nconst VTXT=['#1d3f7a','#fff','#fff','#1d3f7a','#fff']; // val label color per bar type\nconst fmt=v=>Number.isInteger(v)?String(v):String(v).replace('.',',');\n\nconst VW=720,VH=545,pL=200,pR=50,pT=104,pB=24;\nconst cW=VW-pL-pR,cH=VH-pT-pB; // 470, 417\nconst N=DATA.length,NB=5;\nconst GH=cH/N;           // ~104.25\nconst BH=16,BG_I=4;\nconst STACK=NB*BH+(NB-1)*BG_I; // 96\nconst TOP=(GH-STACK)*0.5;       // ~4.1\nconst XS=cW/100;                // 4.7\n\nconst dk=()=>document.documentElement.dataset.mode==='dark'||(!document.documentElement.dataset.mode&&matchMedia('(prefers-color-scheme:dark)').matches);\nconst tc =()=>dk()?'#f0efec':'#111';\nconst tc2=()=>dk()?'#c3c2b7':'#555';\nconst tc3=()=>dk()?'#898781':'#aaa';\nconst gc =()=>dk()?'#2c2c2a':'#ebebeb';\n\nconst NS='http://www.w3.org/2000/svg';\nconst mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};\nconst mkt=(s,a,p)=>{const e=mk('text',a,p);e.textContent=String(s);return e;};\nconst ff=\"'Segoe UI',-apple-system,sans-serif\";\n\nconst svg=document.getElementById('chart');\nmk('rect',{x:0,y:0,width:VW,height:VH,fill:'transparent'},svg);\nconst root=mk('g',{transform:`translate(${pL},${pT})`},svg);\n\n// Title\nconst titleEl=mkt('índice de adaptación biológica de especies',{\n  x:-pL,y:-pT+28,'font-size':17.5,'font-weight':700,\n  fill:tc(),opacity:0,'font-family':ff,'letter-spacing':'-0.3'\n},root);\n\n// Legend — 2 rows\nconst lgG=mk('g',{opacity:0},root);\nconst LY1=-pT+52,LY2=-pT+70;\n[\n  {i:0,dx:0,row:0},{i:1,dx:148,row:0},{i:2,dx:284,row:0},\n  {i:3,dx:0,row:1},{i:4,dx:148,row:1}\n].forEach(({i,dx,row})=>{\n  const LY=row===0?LY1:LY2;\n  mk('rect',{x:-pL+dx,y:LY,width:12,height:12,fill:COLORS[i],rx:2},lgG);\n  mkt(KEYS[i],{x:-pL+dx+17,y:LY+9.5,'font-size':10,fill:tc2(),'font-family':ff},lgG);\n});\n\n// Grid\nconst gridG=mk('g',{opacity:0},root);\n[0,25,50,75,100].forEach(v=>{\n  const x=v*XS;\n  mk('line',{x1:x,y1:0,x2:x,y2:cH,stroke:gc(),'stroke-width':1},gridG);\n  mkt(v,{x,y:-8,'text-anchor':'middle','font-size':9.5,fill:tc3(),'font-family':ff},gridG);\n});\nmk('line',{x1:0,y1:0,x2:0,y2:cH,stroke:dk()?'#383835':'#d0d0cc','stroke-width':1},gridG);\n\n// Bars, labels, value labels\nconst barsG=mk('g',{},root),labG=mk('g',{},root),vlabG=mk('g',{},root);\nconst bars=[];\n\nDATA.forEach((d,gi)=>{\n  const gy=gi*GH+TOP;\n  const lbl=mkt(d.label,{\n    x:-12,y:gy+STACK/2,\n    'text-anchor':'end','dominant-baseline':'middle',\n    'font-size':12.2,fill:tc(),opacity:0,'font-family':ff,\n    'font-style':d.label.startsWith('Homo')?'italic':'normal'\n  },labG);\n\n  d.vals.forEach((val,bi)=>{\n    const tw=val*XS;\n    const by=gy+bi*(BH+BG_I);\n    const r=mk('rect',{x:0,y:by,width:0,height:BH,fill:COLORS[bi],rx:2},barsG);\n    const vl=mkt(fmt(val),{\n      x:5,y:by+BH/2,'dominant-baseline':'central',\n      'font-size':bi===4?9.5:10,'font-weight':700,\n      fill:VTXT[bi],opacity:0,'font-family':ff\n    },vlabG);\n    bars.push({r,vl,lbl,tw,gi,bi});\n  });\n});\n\nmkt('Creado con Datawrapper',{\n  x:-pL,y:cH+16,'font-size':10,fill:tc3(),'font-family':ff\n},root);\n\n// Easing\nconst eExp  =t=>t>=1?1:1-Math.pow(2,-10*t);\nconst eCubic=t=>1-Math.pow(1-t,3);\nconst clamp =(v,a=0,b=1)=>Math.min(Math.max(v,a),b);\nconst pt    =(e,s,d)=>clamp((e-s)/d);\n\n// Timing\nconst SG=300,SB=55,BD=850,T0=400;\nconst TOTAL=T0+(N-1)*SG+(NB-1)*SB+BD+300; // ~2705ms\n\nfunction update(e){\n  titleEl.setAttribute('opacity',eCubic(pt(e,0,320)));\n  lgG.setAttribute('opacity',    eCubic(pt(e,130,330)));\n  gridG.setAttribute('opacity',  eCubic(pt(e,210,330)));\n\n  bars.forEach(b=>{\n    const gs=T0+b.gi*SG;\n    if(b.bi===0) b.lbl.setAttribute('opacity',eCubic(pt(e,gs-85,220)));\n    const t=eExp(pt(e,gs+b.bi*SB,BD));\n    const w=b.tw*t;\n    b.r.setAttribute('width',w);\n    b.vl.setAttribute('opacity',eCubic(clamp((w-20)/16)));\n  });\n  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';\n}\n\n// State\nlet segStart=null,acc=0,state='idle',raf=null;\nconst btnPlay=document.getElementById('btnPlay');\nconst btnPause=document.getElementById('btnPause');\nconst btnReset=document.getElementById('btnReset');\n\nfunction sync(){\n  btnPause.disabled=state!=='playing';\n  btnReset.disabled=state==='idle';\n  btnPlay.disabled=state==='playing';\n  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';\n}\nfunction play(){\n  segStart=performance.now();state='playing';sync();\n  (function loop(){\n    if(state!=='playing')return;\n    const e=acc+(performance.now()-segStart);\n    update(e);\n    if(e>=TOTAL){update(TOTAL);state='done';sync();}\n    else raf=requestAnimationFrame(loop);\n  })();\n}\nfunction pause(){cancelAnimationFrame(raf);acc+=performance.now()-segStart;segStart=null;state='paused';sync();}\nfunction reset(){\n  cancelAnimationFrame(raf);acc=0;segStart=null;state='idle';\n  titleEl.setAttribute('opacity',0);lgG.setAttribute('opacity',0);gridG.setAttribute('opacity',0);\n  bars.forEach(b=>{b.r.setAttribute('width',0);b.vl.setAttribute('opacity',0);b.lbl.setAttribute('opacity',0);});\n  document.getElementById('pFill').style.width='0%';sync();\n}\nbtnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});\nbtnPause.addEventListener('click',pause);\nbtnReset.addEventListener('click',reset);\nsync();\n<\/script>\n", "indice_poder_global_animated.html": "\n<style>\n*{box-sizing:border-box;margin:0;padding:0}\nbody{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}\n.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:720px}\n#chart{width:100%;height:auto;display:block}\n.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}\n.btn{padding:7px 18px;border:0.5px solid var(--border-strong);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--surface-2);color:var(--text-primary);transition:background .12s,transform .12s,box-shadow .12s}\n.btn:hover:not(:disabled){background:var(--surface-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}\n.btn:active:not(:disabled){transform:translateY(0)}\n.btn:disabled{opacity:.3;cursor:not-allowed}\n.btn-primary{background:#1d3557;color:#fff;border-color:#1d3557}\n.btn-primary:hover:not(:disabled){background:#253f6a}\n.pbar{height:2px;background:var(--border);border-radius:99px;margin-top:12px;overflow:hidden}\n.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#1d3557,#48cae4);border-radius:99px}\n<\/style>\n\n<div class=\"card\">\n  <svg id=\"chart\" viewBox=\"0 0 720 490\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" aria-label=\"Índice de poder global — comparación IPG 1986 vs 2082 para 6 bloques geopolíticos\"><\/svg>\n  <div class=\"controls\">\n    <button class=\"btn btn-primary\" id=\"btnPlay\">▶ Reproducir<\/button>\n    <button class=\"btn\" id=\"btnPause\" disabled>⏸ Pausar<\/button>\n    <button class=\"btn\" id=\"btnReset\" disabled>↺ Reiniciar<\/button>\n  <\/div>\n  <div class=\"pbar\"><div class=\"pbar-fill\" id=\"pFill\"><\/div><\/div>\n<\/div>\n\n<script>\nconst DATA=[\n  {label:'Federación Atlántica',   v86:100,v82:68},\n  {label:'Federación Euroasiática',v86:82, v82:41},\n  {label:'Confederación Europea',  v86:76, v82:73},\n  {label:'Japón',                  v86:72, v82:38},\n  {label:'Unión Sino-Pacífica',    v86:34, v82:92},\n  {label:'Liga Andina',            v86:18, v82:47},\n];\n\nconst VW=720,VH=490;\nconst pL=214,pR=48,pT=82,pB=24;\nconst cW=VW-pL-pR,cH=VH-pT-pB;\nconst N=DATA.length,GH=cH/N;\nconst BH=21,BG=8;\nconst OH=(GH-BH*2-BG)*0.5;\nconst XS=cW/100;\nconst C86='#1d3557',C82='#48cae4';\nconst isDark=()=>document.documentElement.dataset.mode==='dark'||(!document.documentElement.dataset.mode&&matchMedia('(prefers-color-scheme:dark)').matches);\n\nconst NS='http://www.w3.org/2000/svg';\nconst mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};\nconst mkt=(s,a,p)=>{const e=mk('text',a,p);e.textContent=String(s);return e;};\nconst ff=\"'Segoe UI',-apple-system,sans-serif\";\n\nconst svg=document.getElementById('chart');\nmk('rect',{x:0,y:0,width:VW,height:VH,fill:'transparent'},svg);\nconst root=mk('g',{transform:`translate(${pL},${pT})`},svg);\n\n// Title\nconst titleEl=mkt('índice de poder global',{\n  x:-pL,y:-pT+26,'font-size':21,'font-weight':700,\n  fill:isDark()?'#f0efec':'#111111',opacity:0,'font-family':ff,'letter-spacing':'-0.3'\n},root);\n\n// Legend\nconst lgG=mk('g',{opacity:0},root);\nconst LY=-pT+50;\n[[0,C86,'IPG_1986'],[108,C82,'IPG_2082']].forEach(([dx,col,lbl])=>{\n  mk('rect',{x:-pL+dx,y:LY,width:13,height:13,fill:col,rx:2.5},lgG);\n  mkt(lbl,{x:-pL+dx+19,y:LY+10.5,'font-size':11.5,fill:isDark()?'#c3c2b7':'#555','font-family':ff},lgG);\n});\n\n// Subtle gridlines\nconst gridG=mk('g',{opacity:0},root);\n[0,25,50,75,100].forEach(v=>{\n  const x=v*XS;\n  mk('line',{x1:x,y1:0,x2:x,y2:cH,stroke:isDark()?'#2c2c2a':'#ebebeb','stroke-width':1},gridG);\n  mkt(v,{x,y:-8,'text-anchor':'middle','font-size':10,fill:isDark()?'#898781':'#aaa','font-family':ff},gridG);\n});\nmk('line',{x1:0,y1:0,x2:0,y2:cH,stroke:isDark()?'#383835':'#ccc','stroke-width':1},gridG);\n\n// Layers\nconst barsG=mk('g',{},root);\nconst labG=mk('g',{},root);\nconst vlabG=mk('g',{},root);\n\nconst bars=[];\nDATA.forEach((d,gi)=>{\n  const gy=gi*GH+OH;\n  const lbl=mkt(d.label,{\n    x:-12,y:gy+BH+BG/2,\n    'text-anchor':'end','dominant-baseline':'middle',\n    'font-size':12.2,fill:isDark()?'#f0efec':'#222',opacity:0,'font-family':ff\n  },labG);\n  function addBar(val,col,yOff){\n    const tw=val*XS;\n    const r=mk('rect',{x:0,y:gy+yOff,width:0,height:BH,fill:col,rx:2},barsG);\n    const vl=mkt(val,{\n      x:5,y:gy+yOff+BH/2,'dominant-baseline':'central',\n      'font-size':11,'font-weight':700,fill:'#fff',opacity:0,'font-family':ff\n    },vlabG);\n    bars.push({r,vl,lbl,tw});\n  }\n  addBar(d.v86,C86,0);\n  addBar(d.v82,C82,BH+BG);\n});\n\nmkt('Creado con Datawrapper',{\n  x:-pL,y:cH+16,'font-size':10,fill:isDark()?'#555':'#ccc','font-family':ff\n},root);\n\n// Easing\nconst eExp  =t=>t>=1?1:1-Math.pow(2,-10*t);\nconst eCubic=t=>1-Math.pow(1-t,3);\nconst clamp =(v,a=0,b=1)=>Math.min(Math.max(v,a),b);\nconst pt    =(e,s,d)=>clamp((e-s)/d);\n\n// Timing\nconst STAGGER=280,BAR_DUR=960,BAR_OFF=90,T0=390;\nconst TOTAL=T0+(N-1)*STAGGER+BAR_OFF+BAR_DUR+320;\n\nfunction update(e){\n  titleEl.setAttribute('opacity',eCubic(pt(e,0,300)));\n  lgG.setAttribute('opacity',    eCubic(pt(e,130,320)));\n  gridG.setAttribute('opacity',  eCubic(pt(e,200,350)));\n\n  for(let gi=0;gi<N;gi++){\n    const gs=T0+gi*STAGGER;\n    const b0=bars[gi*2],b1=bars[gi*2+1];\n\n    // Label appears just before its bars\n    b0.lbl.setAttribute('opacity',eCubic(pt(e,gs-90,230)));\n\n    // Dark bar (IPG_1986)\n    const t0=eExp(pt(e,gs,BAR_DUR));\n    const w0=b0.tw*t0;\n    b0.r.setAttribute('width',w0);\n    b0.vl.setAttribute('opacity',eCubic(clamp((w0-24)/18)));\n\n    // Cyan bar (IPG_2082) — slight delay\n    const t1=eExp(pt(e,gs+BAR_OFF,BAR_DUR));\n    const w1=b1.tw*t1;\n    b1.r.setAttribute('width',w1);\n    b1.vl.setAttribute('opacity',eCubic(clamp((w1-24)/18)));\n  }\n  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';\n}\n\n// State machine\nlet segStart=null,acc=0,state='idle',raf=null;\nconst btnPlay =document.getElementById('btnPlay');\nconst btnPause=document.getElementById('btnPause');\nconst btnReset=document.getElementById('btnReset');\n\nfunction sync(){\n  btnPause.disabled=state!=='playing';\n  btnReset.disabled=state==='idle';\n  btnPlay.disabled =state==='playing';\n  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';\n}\n\nfunction play(){\n  segStart=performance.now(); state='playing'; sync();\n  (function loop(){\n    if(state!=='playing')return;\n    const e=acc+(performance.now()-segStart);\n    update(e);\n    if(e>=TOTAL){update(TOTAL);state='done';sync();}\n    else raf=requestAnimationFrame(loop);\n  })();\n}\n\nfunction pause(){\n  cancelAnimationFrame(raf);\n  acc+=performance.now()-segStart;\n  segStart=null; state='paused'; sync();\n}\n\nfunction reset(){\n  cancelAnimationFrame(raf); acc=0; segStart=null; state='idle';\n  titleEl.setAttribute('opacity',0);\n  lgG.setAttribute('opacity',0);\n  gridG.setAttribute('opacity',0);\n  bars.forEach(b=>{b.r.setAttribute('width',0);b.vl.setAttribute('opacity',0);b.lbl.setAttribute('opacity',0);});\n  document.getElementById('pFill').style.width='0%';\n  sync();\n}\n\nbtnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});\nbtnPause.addEventListener('click',pause);\nbtnReset.addEventListener('click',reset);\nsync();\n<\/script>\n", "poder_economia_aerhyn_2082_animated.html": "\n<style>\n*{box-sizing:border-box;margin:0;padding:0}\nbody{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}\n.card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:22px 20px 18px;width:100%;max-width:720px}\n#chart{width:100%;height:auto;display:block}\n.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}\n.btn{padding:7px 18px;border:0.5px solid var(--border-strong);border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:var(--surface-2);color:var(--text-primary);transition:background .12s,transform .12s,box-shadow .12s}\n.btn:hover:not(:disabled){background:var(--surface-1);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)}\n.btn:active:not(:disabled){transform:translateY(0)}\n.btn:disabled{opacity:.3;cursor:not-allowed}\n.btn-primary{background:#1d3f7a;color:#fff;border-color:#1d3f7a}\n.btn-primary:hover:not(:disabled){background:#254d96}\n.pbar{height:2px;background:var(--border);border-radius:99px;margin-top:12px;overflow:hidden}\n.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#0d2240,#b8e9f5);border-radius:99px}\n<\/style>\n\n<div class=\"card\">\n  <svg id=\"chart\" viewBox=\"0 0 720 510\" xmlns=\"http://www.w3.org/2000/svg\"\n    role=\"img\" aria-label=\"Poder en economía global de Aerhyn 2082 — gráfica de dona con cinco sectores\"><\/svg>\n  <div class=\"controls\">\n    <button class=\"btn btn-primary\" id=\"btnPlay\">▶ Reproducir<\/button>\n    <button class=\"btn\" id=\"btnPause\" disabled>⏸ Pausar<\/button>\n    <button class=\"btn\" id=\"btnReset\" disabled>↺ Reiniciar<\/button>\n  <\/div>\n  <div class=\"pbar\"><div class=\"pbar-fill\" id=\"pFill\"><\/div><\/div>\n<\/div>\n\n<script>\nconst DONUT=[\n  {label:'Tecnología fluídica',    val:24, col:'#b8e9f5', tc:'#1d3f7a'},\n  {label:'Energía',                val:19, col:'#3ab4d8', tc:'#fff'},\n  {label:'Biotecnología',          val:17, col:'#1d3557', tc:'#fff'},\n  {label:'Agricultura adaptativa', val:14, col:'#5bc8e0', tc:'#1d3557'},\n  {label:'Otros',                  val:26, col:'#0d2240', tc:'#fff'},\n];\nlet cum=0;\nDONUT.forEach(d=>{d.sa=cum*3.6;d.sw=d.val*3.6;d.ea=d.sa+d.sw;d.ma=d.sa+d.sw/2;cum+=d.val;});\n\nconst CX=360,CY=295,RO=158,RI=72,RM=(RO+RI)/2;\nconst VW=720,VH=510;\nconst ff=\"'Segoe UI',-apple-system,sans-serif\";\nconst dk=()=>document.documentElement.dataset.mode==='dark'||(!document.documentElement.dataset.mode&&matchMedia('(prefers-color-scheme:dark)').matches);\nconst txc =()=>dk()?'#f0efec':'#111';\nconst txc2=()=>dk()?'#c3c2b7':'#555';\n\nconst NS='http://www.w3.org/2000/svg';\nconst mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};\nconst mkt=(s,a,p)=>{const e=mk('text',a,p);e.textContent=String(s);return e;};\n\nfunction pxy(ang,r){\n  const rad=(ang-90)*Math.PI/180;\n  return[+(CX+r*Math.cos(rad)).toFixed(2),+(CY+r*Math.sin(rad)).toFixed(2)];\n}\n\nfunction donutPath(sa,ea){\n  const sw=ea-sa;\n  if(sw<=0.02)return'M0,0';\n  const lg=sw>180?1:0;\n  const[osx,osy]=pxy(sa,RO),[oex,oey]=pxy(ea,RO);\n  const[iex,iey]=pxy(ea,RI),[isx,isy]=pxy(sa,RI);\n  return`M${osx},${osy}A${RO},${RO},0,${lg},1,${oex},${oey}L${iex},${iey}A${RI},${RI},0,${lg},0,${isx},${isy}Z`;\n}\n\nconst svg=document.getElementById('chart');\nmk('rect',{x:0,y:0,width:VW,height:VH,fill:'transparent'},svg);\n\n// Title\nconst titleEl=mkt('Poder en economía global de Aerhyn 2082',{\n  x:16,y:30,'font-size':19.5,'font-weight':700,\n  fill:txc(),opacity:0,'font-family':ff,'letter-spacing':'-0.3'\n},svg);\n\n// Legend — 1 row\nconst lgG=mk('g',{opacity:0},svg);\nconst LGX=[16,147,212,310,458];\nDONUT.forEach((d,i)=>{\n  mk('rect',{x:LGX[i],y:50,width:12,height:12,fill:d.col,rx:2},lgG);\n  mkt(d.label,{x:LGX[i]+17,y:59.5,'font-size':9.5,fill:txc2(),'font-family':ff},lgG);\n});\n\n// Donut segments + labels\nconst segs=[];\nDONUT.forEach((d,i)=>{\n  const path=mk('path',{fill:d.col,stroke:'#fff','stroke-width':1.8},svg);\n  path.setAttribute('d','M0,0');\n\n  const[lx,ly]=pxy(d.ma,RM);\n  const lg=mk('g',{opacity:0},svg);\n\n  if(d.label==='Agricultura adaptativa'){\n    // 3-line label for narrow segment\n    const txEl=mk('text',{x:lx,y:ly-13,'text-anchor':'middle','font-family':ff},lg);\n    const sp1=mk('tspan',{x:lx,dy:0,'font-size':9,'font-weight':700,fill:d.tc},txEl); sp1.textContent='Agricultura';\n    const sp2=mk('tspan',{x:lx,dy:11,'font-size':9,'font-weight':700,fill:d.tc},txEl); sp2.textContent='adaptativa';\n    const sp3=mk('tspan',{x:lx,dy:14,'font-size':12,'font-weight':700,fill:d.tc},txEl); sp3.textContent=d.val;\n  } else {\n    mkt(d.label,{x:lx,y:ly-8,'text-anchor':'middle','font-size':10.5,'font-weight':700,fill:d.tc,'font-family':ff},lg);\n    mkt(d.val,{x:lx,y:ly+8,'text-anchor':'middle','font-size':13,'font-weight':700,fill:d.tc,'font-family':ff},lg);\n  }\n\n  segs.push({path,lg});\n});\n\n// Credit\nmkt('Creado con Datawrapper',{x:16,y:500,'font-size':10,fill:dk()?'#555':'#bbb','font-family':ff},svg);\n\n// Easing\nconst eExp  =t=>t>=1?1:1-Math.pow(2,-10*t);\nconst eCubic=t=>1-Math.pow(1-t,3);\nconst clamp =(v,a=0,b=1)=>Math.min(Math.max(v,a),b);\nconst pt    =(e,s,d)=>clamp((e-s)/d);\n\nDONUT.forEach(d=>{d.dur=350+(d.sw/360)*720;});\nconst T0=380,STG=265;\nconst TOTAL=T0+(DONUT.length-1)*STG+DONUT[DONUT.length-1].dur+350;\n\nfunction update(e){\n  titleEl.setAttribute('opacity',eCubic(pt(e,0,320)));\n  lgG.setAttribute('opacity',    eCubic(pt(e,120,300)));\n\n  DONUT.forEach((d,i)=>{\n    const tt=eExp(pt(e,T0+i*STG,d.dur));\n    const ce=d.sa+d.sw*tt;\n    segs[i].path.setAttribute('d',donutPath(d.sa,ce));\n    segs[i].lg.setAttribute('opacity',eCubic(clamp((tt-0.72)/0.28)));\n  });\n  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';\n}\n\n// State machine\nlet segStart=null,acc=0,state='idle',raf=null;\nconst btnPlay=document.getElementById('btnPlay');\nconst btnPause=document.getElementById('btnPause');\nconst btnReset=document.getElementById('btnReset');\n\nfunction sync(){\n  btnPause.disabled=state!=='playing';\n  btnReset.disabled=state==='idle';\n  btnPlay.disabled=state==='playing';\n  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';\n}\nfunction play(){\n  segStart=performance.now();state='playing';sync();\n  (function loop(){\n    if(state!=='playing')return;\n    const e=acc+(performance.now()-segStart);\n    update(e);\n    if(e>=TOTAL){update(TOTAL);state='done';sync();}\n    else raf=requestAnimationFrame(loop);\n  })();\n}\nfunction pause(){cancelAnimationFrame(raf);acc+=performance.now()-segStart;segStart=null;state='paused';sync();}\nfunction reset(){\n  cancelAnimationFrame(raf);acc=0;segStart=null;state='idle';\n  titleEl.setAttribute('opacity',0);lgG.setAttribute('opacity',0);\n  segs.forEach(s=>{s.path.setAttribute('d','M0,0');s.lg.setAttribute('opacity',0);});\n  document.getElementById('pFill').style.width='0%';sync();\n}\nbtnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});\nbtnPause.addEventListener('click',pause);\nbtnReset.addEventListener('click',reset);\nsync();\n<\/script>\n", "sectores_urbanos_aerhyn_mapa_zonas.html": "\n<style>\n*{box-sizing:border-box;margin:0;padding:0}\nbody{background:var(--surface-1);display:flex;flex-direction:column;align-items:center;padding:20px 12px 24px;font-family:var(--font-sans)}\n.card{background:#07090d;border:0.5px solid #1a2030;border-radius:12px;padding:22px 20px 18px;width:100%;max-width:530px}\n#chart{width:100%;height:auto;display:block}\n.controls{display:flex;gap:8px;justify-content:center;margin-top:14px}\n.btn{padding:7px 18px;border:0.5px solid #252d3a;border-radius:var(--radius);font-size:12.5px;font-weight:500;cursor:pointer;font-family:inherit;background:#111827;color:#c8d8e8;transition:background .12s,transform .12s}\n.btn:hover:not(:disabled){background:#1a2538;transform:translateY(-1px)}\n.btn:active:not(:disabled){transform:translateY(0)}\n.btn:disabled{opacity:.3;cursor:not-allowed}\n.btn-primary{background:#1a4a8a;color:#fff;border-color:#2060b0}\n.btn-primary:hover:not(:disabled){background:#2060b0}\n.pbar{height:2px;background:#1a2030;border-radius:99px;margin-top:12px;overflow:hidden}\n.pbar-fill{height:100%;width:0%;background:linear-gradient(90deg,#1565c0,#4fc3f7);border-radius:99px}\n<\/style>\n\n<div class=\"card\">\n  <svg id=\"chart\" viewBox=\"0 0 560 690\" xmlns=\"http://www.w3.org/2000/svg\"\n    role=\"img\" aria-label=\"Mapa de sectores urbanos — zonas HAE de Aerhyn\"><\/svg>\n  <div class=\"controls\">\n    <button class=\"btn btn-primary\" id=\"btnPlay\">▶ Reproducir<\/button>\n    <button class=\"btn\" id=\"btnPause\" disabled>⏸ Pausar<\/button>\n    <button class=\"btn\" id=\"btnReset\" disabled>↺ Reiniciar<\/button>\n  <\/div>\n  <div class=\"pbar\"><div class=\"pbar-fill\" id=\"pFill\"><\/div><\/div>\n<\/div>\n\n<script>\nconst VW=560,VH=690;\nconst ff=\"'Segoe UI',-apple-system,sans-serif\";\nconst NS='http://www.w3.org/2000/svg';\nconst mk=(t,a,p)=>{const e=document.createElementNS(NS,t);if(a)for(const[k,v]of Object.entries(a))e.setAttribute(k,v);if(p)p.appendChild(e);return e;};\n\nconst svg=document.getElementById('chart');\nmk('rect',{x:0,y:0,width:VW,height:VH,fill:'#07090d'},svg);\n\n// ── LÍMITE CIUDAD ─────────────────────────────────────────────\n// Polígono octagonal irregular, calibrado contra la imagen original\nconst CITY=\"22,72 188,48 355,57 445,100 488,214 476,378 456,498 386,568 276,610 156,602 60,558 16,446 10,312 16,172 22,72\";\n\nconst defs=mk('defs',{},svg);\n\n// Clip path para las calles\nconst clip=mk('clipPath',{id:'cClip'},defs);\nmk('polygon',{points:CITY},clip);\n\n// Relleno base de la ciudad\nmk('polygon',{points:CITY,fill:'#1c2235'},svg);\n\n// ── MALLA DE CALLES (clipeada al polígono ciudad) ──────────────\nconst gridG=mk('g',{'clip-path':'url(#cClip)'},svg);\n\n// Horizontales cada 22px\nfor(let y=48;y<=612;y+=22)\n  mk('line',{x1:5,y1:y,x2:555,y2:y,stroke:'#0b1020','stroke-width':1.3},gridG);\n\n// Verticales cada 22px\nfor(let x=5;x<=555;x+=22)\n  mk('line',{x1:x,y1:45,x2:x,y2:615,stroke:'#0b1020','stroke-width':1.3},gridG);\n\n// Diagonales NW-SE cada 38px (avenue principale)\nfor(let d=-600;d<=700;d+=38)\n  mk('line',{x1:-10,y1:d,x2:660,y2:d+680,stroke:'#0b1020','stroke-width':0.65},gridG);\n\n// Diagonales NE-SW cada 38px\nfor(let d=-250;d<=980;d+=38)\n  mk('line',{x1:-10,y1:d,x2:660,y2:d-680,stroke:'#0b1020','stroke-width':0.65},gridG);\n\n// Avenidas diagonales principales (más anchas, cada 76px)\nfor(let d=-600;d<=700;d+=76)\n  mk('line',{x1:-10,y1:d,x2:660,y2:d+680,stroke:'#0a0f1e','stroke-width':2.5},gridG);\nfor(let d=-250;d<=980;d+=76)\n  mk('line',{x1:-10,y1:d,x2:660,y2:d-680,stroke:'#0a0f1e','stroke-width':2.5},gridG);\n\n// Borde ciudad\nmk('polygon',{points:CITY,fill:'none',stroke:'#2a3548','stroke-width':2},svg);\n\n// ── ZONAS (inicialmente invisibles) ───────────────────────────\nconst ZONES=[\n  {\n    // Resonador Ω — franja izquierda, parcialmente fuera de la ciudad\n    rows:['Resonador','Ω'],\n    pts:\"8,378 102,370 132,390 138,425 132,462 114,494 70,508 8,500 8,378\",\n    lx:68, ly:438\n  },\n  {\n    // Zona Umbral — centro-derecha, dentro ciudad\n    rows:['Zona','Umbral'],\n    pts:\"268,324 348,318 400,342 412,378 410,424 385,458 340,468 296,460 260,434 254,398 258,355 268,324\",\n    lx:334, ly:391\n  },\n  {\n    // Zona de emulsión — centro-inferior\n    rows:['Zona de','emulsión'],\n    pts:\"178,472 262,464 334,480 348,512 334,552 296,572 242,572 198,554 172,524 170,494 178,472\",\n    lx:262, ly:518\n  },\n  {\n    // Reactor 4 — gran cuchilla diagonal superior-derecha\n    rows:['Reactor 4'],\n    pts:\"420,425 406,295 398,162 418,70 462,40 510,52 545,98 550,208 532,336 496,432 460,448 426,442 420,425\",\n    lx:472, ly:225\n  }\n];\n\n// Crear grupos de zona\nconst ZDATA=ZONES.map(z=>{\n  const g=mk('g',{opacity:0},svg);\n  mk('polygon',{points:z.pts,fill:'#1976d2',opacity:0.87},g);\n\n  // Etiqueta multilínea\n  const txt=mk('text',{\n    x:z.lx,'text-anchor':'middle',\n    'font-size':11,'font-weight':700,fill:'#fff','font-family':ff\n  },g);\n  const n=z.rows.length, dy0=z.ly-(n-1)*8;\n  z.rows.forEach((row,i)=>{\n    const s=mk('tspan',{x:z.lx,y:dy0+i*16,'dominant-baseline':'middle'},txt);\n    s.textContent=row;\n  });\n  return{g};\n});\n\n// ── TÍTULO ────────────────────────────────────────────────────\nconst titleEl=mk('text',{\n  x:15,y:22,'font-size':14,'font-weight':700,fill:'#a0b8d8',opacity:0,\n  'font-family':ff,'letter-spacing':'-0.2'\n},svg);\ntitleEl.textContent='Concentración HAE por sector';\n\nmk('text',{x:VW-15,y:VH-10,'text-anchor':'end','font-size':9,fill:'#1e2a38','font-family':ff},svg)\n  .textContent='Creado con Datawrapper';\n\n// ── ANIMACIÓN ─────────────────────────────────────────────────\nconst eCubic=t=>1-Math.pow(1-t,3);\nconst clamp=(v,a=0,b=1)=>Math.min(Math.max(v,a),b);\nconst pt=(e,s,d)=>clamp((e-s)/d);\n\nconst T0=300,ZDUR=420,STAGGER=380;\nconst TOTAL=T0+(ZONES.length-1)*STAGGER+ZDUR+350;\n\nfunction update(e){\n  titleEl.setAttribute('opacity',eCubic(pt(e,0,320)));\n  ZDATA.forEach((z,i)=>z.g.setAttribute('opacity',eCubic(pt(e,T0+i*STAGGER,ZDUR))));\n  document.getElementById('pFill').style.width=clamp(e/TOTAL)*100+'%';\n}\n\n// ── MÁQUINA DE ESTADOS ────────────────────────────────────────\nlet segStart=null,acc=0,state='idle',raf=null;\nconst btnPlay=document.getElementById('btnPlay');\nconst btnPause=document.getElementById('btnPause');\nconst btnReset=document.getElementById('btnReset');\nfunction sync(){\n  btnPause.disabled=state!=='playing';\n  btnReset.disabled=state==='idle';\n  btnPlay.disabled=state==='playing';\n  btnPlay.textContent=state==='paused'?'▶ Continuar':state==='done'?'▶ Repetir':'▶ Reproducir';\n}\nfunction play(){\n  segStart=performance.now();state='playing';sync();\n  (function loop(){\n    if(state!=='playing')return;\n    const e=acc+(performance.now()-segStart);\n    update(e);\n    if(e>=TOTAL){update(TOTAL);state='done';sync();}\n    else raf=requestAnimationFrame(loop);\n  })();\n}\nfunction pause(){cancelAnimationFrame(raf);acc+=performance.now()-segStart;segStart=null;state='paused';sync();}\nfunction reset(){\n  cancelAnimationFrame(raf);acc=0;segStart=null;state='idle';\n  titleEl.setAttribute('opacity',0);\n  ZDATA.forEach(z=>z.g.setAttribute('opacity',0));\n  document.getElementById('pFill').style.width='0%';sync();\n}\nbtnPlay.addEventListener('click',()=>{if(state==='done')reset();play();});\nbtnPause.addEventListener('click',pause);\nbtnReset.addEventListener('click',reset);\nsync();\n<\/script>\n"}</script>
+
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script>window.RES_EXTERNAL = true;</script>
 <script>
 /* ============================================================
    RESONADOR Ω — modelo 3D paramétrico (Three.js r147)
@@ -625,9 +774,13 @@ header > * { pointer-events: auto; }
 <script>
 /* ============================================================
    Visor interactivo del Resonador Ω — seis estados sobre un mismo modelo
+   ResonadorApp(): sin opciones se construye y anima solo (comportamiento original).
+   Con { external: true } empieza inactivo y cede el bucle a experiencia.js (RES.update/enter/exit).
    ============================================================ */
-(function () {
+window.ResonadorApp = function (opts) {
   'use strict';
+  opts = opts || {};
+  let active = !opts.external;
   const T = THREE, PI = Math.PI, D2R = PI / 180;
   const $ = function (s) { return document.querySelector(s); };
   const M = ResonadorModel.build();
@@ -648,6 +801,7 @@ header > * { pointer-events: auto; }
   const controls = new T.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true; controls.dampingFactor = 0.08; controls.target.set(0, 6, 0);
   controls.minDistance = 2.5; controls.maxDistance = 110; controls.maxPolarAngle = PI * 0.52;
+  controls.enabled = active;
   scene.add(M.root);
 
   // entorno de estudio (reflejos para el metal)
@@ -868,10 +1022,11 @@ header > * { pointer-events: auto; }
     tgt = { t: s.t, cut: s.cut, xray: s.xray, tint: s.tint, guides: s.guides || 0 };
     if (s.xr) stateXr = s.xr;
     activeLabels = s.labels; wantInset = !!s.inset;
-    tween = { t0: performance.now(), dur: 1500, p0: camera.position.clone(), t0v: controls.target.clone(), p1: new T.Vector3().fromArray(s.cam.p), t1: new T.Vector3().fromArray(s.cam.t) };
+    tween = !active ? null : { t0: performance.now(), dur: 1500, p0: camera.position.clone(), t0v: controls.target.clone(), p1: new T.Vector3().fromArray(s.cam.p), t1: new T.Vector3().fromArray(s.cam.t) };
     renderUI();
   }
   window.addEventListener('keydown', function (e) {
+    if (!active) return;
     if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
     const ids = ['general', 'despiece', 'explosion', 'corte', 'transparencia', 'acercamiento'], i = parseInt(e.key, 10);
     if (i >= 1 && i <= 6) go(ids[i - 1]);
@@ -957,6 +1112,7 @@ header > * { pointer-events: auto; }
   const ray = new T.Raycaster(), mouse = new T.Vector2(); let down = null;
   renderer.domElement.addEventListener('pointerdown', function (e) { down = [e.clientX, e.clientY]; });
   renderer.domElement.addEventListener('pointerup', function (e) {
+    if (!active) return;
     if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
     const r = renderer.domElement.getBoundingClientRect();
     mouse.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
@@ -1043,7 +1199,7 @@ header > * { pointer-events: auto; }
     M.SECTION.value = cs ? 1 : 0;
     const cMin = (1 - cutOpen) * 3.2, c = 8 + (cMin - 8) * cur.cut;
     M.CUT.planes[0].constant = c; M.CUT.planes[1].constant = c;
-    cotas.visible = showCotas && activeState().cotas && cur.t < .05;
+    cotas.visible = active && showCotas && activeState().cotas && cur.t < .05;
     const core = byId.Nucleo_Omega; core.getWorldPosition(tmp); fx.position.copy(tmp);
     fx.visible = true;
   }
@@ -1110,18 +1266,899 @@ header > * { pointer-events: auto; }
   }
   function render3() { renderer.render(scene, camera); }
   let last = performance.now();
-  function loop(now) {
-    requestAnimationFrame(loop);
+  function update(now) {
     const dt = Math.min(.05, (now - last) / 1000); last = now;
-    step(dt); controls.update(); applyModel(); render3(); drawLabels();
-    const showIn = wantInset && cur.xray > .6; insetEl.classList.toggle('show', showIn);
+    step(dt); if (active) controls.update(); applyModel(); render3(); if (active) drawLabels();
+    const showIn = active && wantInset && cur.xray > .6; insetEl.classList.toggle('show', showIn);
     if (showIn) { mol.rotation.y += dt * .35; mol.rotation.x = Math.sin(now / 3000) * .15; ir.render(isc, icam); }
   }
-  renderUI(); requestAnimationFrame(loop);
-  window.RES = { go: go, camera: camera, controls: controls, units: byId, cur: cur, scene: scene, renderer: renderer, M: M };
-})();
+  function loop(now) { requestAnimationFrame(loop); update(now); }
+  // modo experiencia: entrar activa controles e interfaz; salir deja el modelo en General y limpia la capa 2D
+  function enter() { active = true; controls.enabled = true; go('general'); }
+  function exit() {
+    active = false; controls.enabled = false; selected = null; go('general');
+    svg.innerHTML = ''; cotaH.hidden = cotaD.hidden = true; insetEl.classList.remove('show');
+    panel.classList.remove('open'); $('#btnPanel').setAttribute('aria-pressed', false); $('#app').classList.remove('pan');
+  }
+  renderUI(); if (!opts.external) requestAnimationFrame(loop);
+  window.RES = { go: go, camera: camera, controls: controls, units: byId, cur: cur, scene: scene, renderer: renderer, M: M,
+    enter: enter, exit: exit, update: update, floor: floor, home: STATES.general.cam,
+    state: function () { return { active: active, id: stateId, zone: zoneId }; } };
+  return window.RES;
+};
+if (!window.RES_EXTERNAL) window.ResonadorApp();
 
 document.getElementById('btnPanel').addEventListener('click', function () { document.getElementById('app').classList.toggle('pan'); });
+</script>
+<script>
+/* ============================================================
+   Laboratorio: nave industrial procedural alrededor del Resonador Ω (metros, escala real)
+   Laboratorio.build(RES, { shadows }) → { group, OFFICE, zones, view(), portada(), pick(), setHover(), setK(), collect(), update() }
+   No toca el modelo: solo añade objetos a la escena del visor y se desvanece con setK(0..1).
+   ============================================================ */
+window.Laboratorio = (function () {
+  'use strict';
+  const T = THREE, PI = Math.PI;
+  const X0 = -22, X1 = 30, Z0 = -20, Z1 = 72, HT = 20;          // nave (frente abierto hacia +z)
+  const OFFICE = { x0: 8, x1: 16, z0: 9, z1: 15 };              // oficina de análisis
+  const FOG = 0x1d2125;
+
+  // r147 trata los colores hex como lineales: se convierten para que el tono sea el que se lee en el código
+  function lin(c) { return new T.Color(c).convertSRGBToLinear(); }
+  let seed = 11;
+  function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+  function tex(w, h, draw, rep) {
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    draw(c.getContext('2d'), w, h);
+    const t = new T.CanvasTexture(c); t.encoding = T.sRGBEncoding; t.anisotropy = 8;
+    if (rep) { t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(rep[0], rep[1]); }
+    return t;
+  }
+  function speckle(g, w, h, n, a, s) {
+    for (let i = 0; i < n; i++) {
+      g.fillStyle = (rnd() > .5 ? 'rgba(255,255,255,' : 'rgba(0,0,0,') + (a * rnd()).toFixed(3) + ')';
+      g.fillRect(rnd() * w, rnd() * h, s * (.4 + rnd()), s * (.4 + rnd()));
+    }
+  }
+  function stains(g, w, h, n, a) {
+    for (let i = 0; i < n; i++) {
+      const x = rnd() * w, y = rnd() * h, r = 20 + rnd() * w * .25, gr = g.createRadialGradient(x, y, 0, x, y, r);
+      gr.addColorStop(0, 'rgba(20,18,14,' + (a * rnd()).toFixed(3) + ')'); gr.addColorStop(1, 'rgba(20,18,14,0)');
+      g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    }
+  }
+
+  function build(RES, opt) {
+    opt = opt || {};
+    const scene = RES.scene, group = new T.Group(); group.name = 'Laboratorio'; scene.add(group);
+    const std = function (c, r, m, extra) { return new T.MeshStandardMaterial(Object.assign({ color: lin(c), roughness: r, metalness: m || 0 }, extra || {})); };
+    function box(w, h, d, mat, x, y, z, parent) {
+      const o = new T.Mesh(new T.BoxGeometry(w, h, d), mat); o.position.set(x, y, z);
+      o.castShadow = o.receiveShadow = !!opt.shadows; (parent || group).add(o); return o;
+    }
+    function cyl(r1, r2, h, mat, x, y, z, seg, parent) {
+      const o = new T.Mesh(new T.CylinderGeometry(r1, r2, h, seg || 16), mat); o.position.set(x, y, z);
+      o.castShadow = !!opt.shadows; (parent || group).add(o); return o;
+    }
+    // instancias de cajas: lista de [x, y, z, sx, sy, sz]
+    function boxes(list, mat, cast) {
+      const im = new T.InstancedMesh(new T.BoxGeometry(1, 1, 1), mat, list.length), m4 = new T.Matrix4();
+      list.forEach(function (b, i) { m4.makeScale(b[3], b[4], b[5]).setPosition(b[0], b[1], b[2]); im.setMatrixAt(i, m4); });
+      im.castShadow = !!(cast && opt.shadows); im.receiveShadow = !!opt.shadows; group.add(im); return im;
+    }
+
+    /* ---------- materiales ---------- */
+    const concreteT = tex(1024, 1024, function (g, w, h) {
+      g.fillStyle = '#64635d'; g.fillRect(0, 0, w, h);
+      stains(g, w, h, 26, .26); speckle(g, w, h, 9000, .09, 2.2);
+      g.strokeStyle = 'rgba(30,28,24,.55)'; g.lineWidth = 3; g.strokeRect(1.5, 1.5, w - 3, h - 3);
+      g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = 1; g.strokeRect(5, 5, w - 10, h - 10);
+    }, [(X1 - X0) / 6, (Z1 - Z0) / 6]);
+    const wallT = tex(256, 1024, function (g, w, h) {
+      g.fillStyle = '#6b6f69'; g.fillRect(0, 0, w, h);                       // paneles superiores
+      g.fillStyle = '#3b4540'; g.fillRect(0, h * .85, w, h * .15);            // zócalo pintado (3 m)
+      g.fillStyle = '#7c6a3a'; g.fillRect(0, h * .845, w, 5);                 // franja ocre
+      stains(g, w, h, 16, .18); speckle(g, w, h, 3500, .07, 2);
+      g.fillStyle = 'rgba(25,25,25,.35)'; for (let x = 0; x < w; x += 64) g.fillRect(x, 0, 2, h * .845);
+      for (let y = 0; y < h * .84; y += 128) g.fillRect(0, y, w, 1.5);
+      const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, 'rgba(0,0,0,.35)'); gr.addColorStop(.5, 'rgba(0,0,0,0)');
+      g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    });
+    const hazardT = tex(256, 256, function (g, w, h) {
+      g.fillStyle = '#b8932a'; g.fillRect(0, 0, w, h); g.fillStyle = '#1c1c1a';
+      for (let i = -h; i < w; i += 64) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i + 32, 0); g.lineTo(i + 32 + h, h); g.lineTo(i + h, h); g.closePath(); g.fill(); }
+      speckle(g, w, h, 1500, .18, 2);
+    }, [18, 18]);
+    const windowT = tex(256, 256, function (g, w, h) {
+      const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#c9d3d8'); gr.addColorStop(1, '#8e9ba3');
+      g.fillStyle = gr; g.fillRect(0, 0, w, h); speckle(g, w, h, 900, .12, 3);
+      g.fillStyle = '#2a2f33'; for (let i = 0; i <= 4; i++) { g.fillRect(i * (w - 8) / 4, 0, 8, h); g.fillRect(0, i * (h - 8) / 4, w, 8); }
+    });
+    const gratingT = tex(128, 128, function (g, w, h) {
+      g.fillStyle = '#1e2124'; g.fillRect(0, 0, w, h); g.fillStyle = '#4a4f54';
+      for (let i = 0; i < w; i += 16) g.fillRect(i, 0, 4, h); g.fillRect(0, 0, w, 4); g.fillRect(0, h / 2, w, 3);
+    }, [2, 18]);
+    const stencilT = tex(2048, 200, function (g, w, h) {
+      g.fillStyle = '#26302b'; g.fillRect(0, 0, w, h); speckle(g, w, h, 4000, .12, 3);
+      g.strokeStyle = '#b9ad8c'; g.lineWidth = 4; g.strokeRect(14, 14, w - 28, h - 28);
+      g.fillStyle = '#d9cfb4'; g.font = '600 118px "Barlow Condensed", "Arial Narrow", sans-serif'; g.textBaseline = 'middle'; g.textAlign = 'center';
+      g.fillText('INSTITUTO KURCHÁTOV · PROYECTO Ω', w / 2, h / 2 + 6);
+    });
+    const M = {
+      floor: std(0xffffff, .92, 0, { map: concreteT }),
+      wall: std(0xffffff, .95, 0, { map: wallT }),
+      concrete: std(0x7d7c76, .9),
+      roof: std(0x23272b, .9),
+      steel: std(0x3b4248, .55, .6),
+      green: std(0x4f5b54, .6, .25),
+      ochre: std(0x9a7a2c, .55, .3),
+      rail: std(0xb08a2e, .5, .3),
+      black: std(0x1b1d1f, .7, .2),
+      copper: std(0xb4672e, .35, 1),
+      tray: std(0x8d9296, .45, .7),
+      paintDisk: std(0x5c5e5b, .85),
+      hazard: std(0xffffff, .8, 0, { map: hazardT }),
+      grating: std(0xffffff, .6, .5, { map: gratingT }),
+      window: new T.MeshBasicMaterial({ map: windowT, color: lin(0x9aa6ad) }),
+      bulb: new T.MeshBasicMaterial({ color: lin(0xffe9c4) }),
+      stencil: std(0xffffff, .8, 0, { map: stencilT }),
+      lineY: std(0xb8932a, .7),
+      led: new T.MeshBasicMaterial({ color: lin(0x7dbb6a) }),
+      ledA: new T.MeshBasicMaterial({ color: lin(0xffb74a) })
+    };
+    M.window.userData.op0 = 1;
+
+    /* ---------- piso, muros, techo ---------- */
+    const floor = new T.Mesh(new T.PlaneGeometry(X1 - X0, Z1 - Z0), M.floor);
+    floor.rotation.x = -PI / 2; floor.position.set((X0 + X1) / 2, 0, (Z0 + Z1) / 2); floor.receiveShadow = !!opt.shadows; group.add(floor);
+    function wall(len, x, z, ry) {
+      const t = wallT.clone(); t.needsUpdate = true; t.wrapS = T.RepeatWrapping; t.repeat.set(len / 4, 1);
+      const m = M.wall.clone(); m.map = t;
+      const o = new T.Mesh(new T.PlaneGeometry(len, HT), m); o.position.set(x, HT / 2, z); o.rotation.y = ry; o.receiveShadow = !!opt.shadows; group.add(o);
+    }
+    wall(X1 - X0, (X0 + X1) / 2, Z0, 0);
+    wall(Z1 - Z0, X0, (Z0 + Z1) / 2, PI / 2);
+    wall(Z1 - Z0, X1, (Z0 + Z1) / 2, -PI / 2);
+    const roof = new T.Mesh(new T.PlaneGeometry(X1 - X0, Z1 - Z0), M.roof); roof.rotation.x = PI / 2; roof.position.set((X0 + X1) / 2, HT, (Z0 + Z1) / 2); group.add(roof);
+    // ventanas altas
+    const wg = new T.PlaneGeometry(4, 4.4);
+    for (let x = X0 + 4; x < X1 - 2; x += 5.5) { const o = new T.Mesh(wg, M.window); o.position.set(x, 15.2, Z0 + .05); group.add(o); }
+    for (let z = Z0 + 5; z < Z1 - 4; z += 6.5) {
+      const a = new T.Mesh(wg, M.window); a.position.set(X0 + .05, 15.2, z); a.rotation.y = PI / 2; group.add(a);
+      const b = new T.Mesh(wg, M.window); b.position.set(X1 - .05, 15.2, z); b.rotation.y = -PI / 2; group.add(b);
+    }
+    // pilastras, cerchas y correas del techo
+    const pil = [];
+    for (let x = X0 + 2; x < X1; x += 8) pil.push([x, HT / 2, Z0 + .35, .8, HT, .7]);
+    for (let z = Z0 + 6; z < Z1; z += 8) { pil.push([X0 + .35, HT / 2, z, .7, HT, .8]); pil.push([X1 - .35, HT / 2, z, .7, HT, .8]); }
+    boxes(pil, M.concrete, false);
+    const tr = [];
+    for (let z = Z0 + 6; z < Z1; z += 8) { tr.push([(X0 + X1) / 2, HT - .5, z, X1 - X0, .9, .35]); tr.push([(X0 + X1) / 2, HT - 1.6, z, X1 - X0, .12, .2]); }
+    for (let x = X0 + 6; x < X1; x += 8) tr.push([x, HT - .25, (Z0 + Z1) / 2, .2, .3, Z1 - Z0]);
+    boxes(tr, M.steel, false);
+    // letrero sobre las pilastras del fondo (lado de la oficina, libre de columnas)
+    const st = new T.Mesh(new T.PlaneGeometry(14, 1.37), M.stencil); st.position.set(20, 11.4, Z0 + .75); group.add(st);
+
+    /* ---------- marcas del piso ---------- */
+    const disk = new T.Mesh(new T.CircleGeometry(7.6, 96), M.paintDisk); disk.rotation.x = -PI / 2; disk.position.y = .004; disk.receiveShadow = !!opt.shadows; group.add(disk);
+    const hz = new T.Mesh(new T.RingGeometry(7.6, 8.05, 128), M.hazard); hz.rotation.x = -PI / 2; hz.position.y = .006; hz.receiveShadow = !!opt.shadows; group.add(hz);
+    const lines = [];
+    [-10.5, 18.5].forEach(function (x) { lines.push([x, .005, (Z0 + 2 + Z1) / 2, .14, .01, Z1 - Z0 - 4]); });
+    lines.push([4, .005, 20, 29, .01, .14]); lines.push([4, .005, -12, 29, .01, .14]);
+    boxes(lines, M.lineY, false);
+    const tg = new T.Mesh(new T.PlaneGeometry(.9, 12), M.grating); tg.rotation.x = -PI / 2; tg.position.set(-2.5, .006, -14); group.add(tg);
+
+    /* ---------- barandilla de contención ---------- */
+    (function () {
+      const R = 7.25, n = 40, posts = [];
+      for (let i = 0; i < n; i++) { const a = i / n * PI * 2; posts.push([R * Math.cos(a), .55, R * Math.sin(a), .07, 1.1, .07]); }
+      boxes(posts, M.rail, true);
+      [1.08, .58].forEach(function (y) {
+        const t = new T.Mesh(new T.TorusGeometry(R, .028, 6, 160), M.rail); t.rotation.x = PI / 2; t.position.y = y; group.add(t);
+      });
+      const kick = new T.Mesh(new T.CylinderGeometry(R, R, .12, 160, 1, true), M.rail); kick.position.y = .07; group.add(kick);
+    })();
+
+    /* ---------- puente grúa sobre el reactor ---------- */
+    (function () {
+      const cols = [], beams = [];
+      [-10.5, 10.5].forEach(function (x) {
+        [-18, -7, 5].forEach(function (z) { cols.push([x, 7.75, z, .5, 15.5, .5]); });
+        beams.push([x, 15.9, -6.5, .5, .9, 27]);
+      });
+      boxes(cols, M.steel, true); boxes(beams, M.steel, true);
+      const crane = [];
+      [-.6, .6].forEach(function (z) { crane.push([0, 16.85, z, 21.6, 1.0, .42]); });
+      [-10.5, 10.5].forEach(function (x) { crane.push([x, 16.55, 0, .9, .55, 2.6]); });
+      crane.push([0, 17.65, 0, 2.2, .7, 2.0]);
+      boxes(crane, M.ochre, true);
+      [-.18, .18].forEach(function (z) { cyl(.025, .025, 2.6, M.black, 0, 16.0, z, 6); });
+      box(.5, .7, .3, M.ochre, 0, 14.4, 0);
+      const hook = new T.Mesh(new T.TorusGeometry(.16, .045, 8, 20, PI * 1.4), M.steel); hook.position.set(0, 13.85, 0); group.add(hook);
+    })();
+
+    /* ---------- luminarias colgantes ---------- */
+    (function () {
+      const pts = [];
+      for (let x = -14; x <= 26; x += 10) for (let z = -14; z <= 46; z += 10) pts.push([x, z]);
+      const cableG = new T.CylinderGeometry(.012, .012, 1, 4), shadeG = new T.ConeGeometry(.55, .4, 20, 1, true), bulbG = new T.CircleGeometry(.36, 20);
+      const c = new T.InstancedMesh(cableG, M.black, pts.length), s = new T.InstancedMesh(shadeG, M.green, pts.length), b = new T.InstancedMesh(bulbG, M.bulb, pts.length);
+      const m4 = new T.Matrix4(), q = new T.Quaternion().setFromEuler(new T.Euler(PI / 2, 0, 0)), one = new T.Vector3(1, 1, 1);
+      pts.forEach(function (p, i) {
+        const y = 13.4;
+        m4.makeScale(1, HT - y, 1).setPosition(p[0], (HT + y) / 2, p[1]); c.setMatrixAt(i, m4);
+        m4.identity().setPosition(p[0], y, p[1]); s.setMatrixAt(i, m4);
+        m4.compose(new T.Vector3(p[0], y - .19, p[1]), q, one); b.setMatrixAt(i, m4);
+      });
+      M.green.side = T.DoubleSide; group.add(c, s, b);
+    })();
+
+    /* ---------- bandejas de cables ---------- */
+    (function () {
+      const tb = [], hangers = [];
+      tb.push([(X0 + X1) / 2, 9, Z0 + .6, X1 - X0 - 2, .1, .6]);
+      tb.push([X0 + .7, 9, (Z0 + 34) / 2, .6, .1, 34 - Z0]);
+      tb.push([-7.5, 10.5, (Z0 - 3) / 2, .6, .1, -3 - Z0]);                      // del reactor al muro
+      for (let z = -4; z > Z0; z -= 3.2) hangers.push([-7.5, (HT + 10.5) / 2, z, .04, HT - 10.5, .04]);
+      boxes(tb, M.tray, true); boxes(hangers, M.steel, false);
+      const cab = [];
+      [-.18, 0, .18].forEach(function (o) {
+        cab.push([(X0 + X1) / 2, 9.09, Z0 + .6 + o, X1 - X0 - 2, .07, .07]);
+        cab.push([-7.5 + o, 10.59, (Z0 - 3) / 2, .07, .07, -3 - Z0]);
+      });
+      boxes(cab, M.black, false);
+      // bajada vertical de cables hacia la base del reactor
+      box(.6, 10.4, .12, M.tray, -7.5, 5.3, -3.06); box(.4, .1, 3.6, M.tray, -7.5, .06, -1.3);
+    })();
+
+    /* ---------- equipos de escenario (no responden al clic) ---------- */
+    (function () {
+      const cab = [];
+      for (let i = 0; i < 9; i++) cab.push([-19 + i * 1.08, 1.1, Z0 + 1.0, 1.0, 2.2, .62]);
+      boxes(cab, M.green, true);
+      const leds = [], ledsA = [];
+      for (let i = 0; i < 9; i++) { (i % 3 ? leds : ledsA).push([-19 + i * 1.08 - .3, 1.85, Z0 + 1.33, .06, .06, .02]); leds.push([-19 + i * 1.08 - .18, 1.85, Z0 + 1.33, .06, .06, .02]); }
+      boxes(leds, M.led, false); boxes(ledsA, M.ledA, false);
+      // pupitres de control junto al muro izquierdo, con diales de cobre
+      for (let k = 0; k < 3; k++) {
+        const z = -6 + k * 4.2, gC = new T.Group(); gC.position.set(X0 + 1.4, 0, z); gC.rotation.y = PI / 2; group.add(gC);
+        box(3.2, .85, 1.0, M.green, 0, .425, 0, gC);
+        const p = box(3.2, .06, .8, M.black, 0, 1.0, .05, gC); p.rotation.x = -.5;
+        box(3.2, .9, .3, M.green, 0, 1.4, -.45, gC);
+        for (let d = 0; d < 6; d++) { const c = cyl(.06, .06, .03, M.copper, -1.2 + d * .48, 1.32, -.29, 14, gC); c.rotation.x = PI / 2; }
+      }
+      // tanque de vacío horizontal al fondo
+      const tk = cyl(1.2, 1.2, 4.2, M.steel, 9, 1.55, Z0 + 3.4, 28); tk.rotation.z = PI / 2;
+      [7.6, 10.4].forEach(function (x) { box(.3, .5, 2.0, M.black, x, .25, Z0 + 3.4); });
+      // cilindros de gas
+      for (let i = 0; i < 6; i++) cyl(.12, .12, 1.5, i % 2 ? M.green : M.steel, 24.5 + (i % 3) * .3, .75, Z0 + 1 + Math.floor(i / 3) * .32, 12);
+      // cajas de madera
+      const wood = std(0x6d5536, .8);
+      box(1.2, 1.0, 1.0, wood, 26.5, .5, 18); box(1.0, .8, 1.0, wood, 26.4, 1.4, 18.1); box(1.4, 1.1, 1.2, wood, 25.4, .55, 20.2);
+    })();
+
+    /* ---------- luces del laboratorio (intensidad × k; no cambian el visor) ---------- */
+    // van en la escena (no en el grupo): así el número de luces no cambia al ocultar el laboratorio y no se recompilan materiales
+    const lights = [];
+    function light(l, i) { l.userData.i0 = i; l.intensity = i; scene.add(l); lights.push(l); return l; }
+    light(new T.HemisphereLight(0xc4ccd6, 0x2e2b27, .32), .32);
+    const sun = light(new T.DirectionalLight(0xe4ecf4, .7), .7);
+    sun.position.set(-24, 34, -12); sun.target.position.set(6, 0, 6); scene.add(sun.target);
+    if (opt.shadows) {
+      sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -.0006; sun.shadow.normalBias = .02;
+      const sc = sun.shadow.camera; sc.left = -26; sc.right = 26; sc.top = 26; sc.bottom = -26; sc.near = 5; sc.far = 90;
+    }
+    const fillL = light(new T.PointLight(0xfff0d8, .4, 46, 1.6), .4); fillL.position.set(8, 15, 14);
+
+    /* ---------- zonas clicables (solo dos) y su resaltado ---------- */
+    const hiMat = function () { return new T.MeshBasicMaterial({ color: lin(0xffc56b), transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending }); };
+    const ringHi = new T.Mesh(new T.RingGeometry(8.15, 8.4, 128), hiMat()); ringHi.rotation.x = -PI / 2; ringHi.position.y = .012; group.add(ringHi);
+    const offHi = new T.Group(); group.add(offHi);
+    (function () {
+      const m = hiMat(), o = OFFICE, w = o.x1 - o.x0, d = o.z1 - o.z0, cx = (o.x0 + o.x1) / 2, cz = (o.z0 + o.z1) / 2;
+      [[w + .4, .2, cx, o.z0 - .2], [w + .4, .2, cx, o.z1 + .2], [.2, d + .4, o.x0 - .2, cz], [.2, d + .4, o.x1 + .2, cz]].forEach(function (s) {
+        const p = new T.Mesh(new T.PlaneGeometry(s[0], s[1]), m); p.rotation.x = -PI / 2; p.position.set(s[2], .012, s[3]); offHi.add(p);
+      });
+      offHi.userData.mat = m;
+    })();
+    const inv = new T.MeshBasicMaterial({ visible: false });
+    const hitR = new T.Mesh(new T.CylinderGeometry(7.4, 7.4, 14.5, 24), inv); hitR.position.y = 7.25; hitR.userData.zone = 'reactor'; group.add(hitR);
+    const hitO = new T.Mesh(new T.BoxGeometry(OFFICE.x1 - OFFICE.x0 + .6, 2.8, OFFICE.z1 - OFFICE.z0 + .6), inv);
+    hitO.position.set((OFFICE.x0 + OFFICE.x1) / 2, 1.4, (OFFICE.z0 + OFFICE.z1) / 2); hitO.userData.zone = 'oficina'; group.add(hitO);
+    const zones = {
+      reactor: { anchor: new T.Vector3(0, 14.4, 0), hi: 0 },
+      oficina: { anchor: new T.Vector3((OFFICE.x0 + OFFICE.x1) / 2, 3.2, (OFFICE.z0 + OFFICE.z1) / 2), hi: 0 }
+    };
+    let hover = null;
+
+    /* ---------- desvanecimiento ---------- */
+    let mats = [];
+    function collect() {
+      const set = new Set();
+      group.traverse(function (o) { if (o.material && o.material !== inv) set.add(o.material); });
+      mats = Array.from(set);
+      mats.forEach(function (m) {
+        if (m.userData.op0 === undefined) { m.userData.op0 = m.opacity; m.userData.tr0 = m.transparent; }
+        if (m.isMeshStandardMaterial) m.envMapIntensity = m.metalness > .5 ? .5 : .18;   // el entorno de estudio es para el metal del reactor
+      });
+    }
+    collect();
+    scene.fog = new T.FogExp2(lin(FOG), 0);                  // la niebla se codifica a sRGB; el color de fondo no
+    let kNow = -1;
+    function setK(k) {
+      if (k === kNow) return; kNow = k;
+      group.visible = k > .002;
+      mats.forEach(function (m) {
+        const hiM = m === ringHi.material || m === offHi.userData.mat;
+        if (!hiM) m.opacity = m.userData.op0 * k;
+        const t = hiM || m.userData.tr0 || k < .999;
+        if (m.transparent !== t) { m.transparent = t; m.needsUpdate = true; }
+      });
+      lights.forEach(function (l) { l.intensity = l.userData.i0 * k; });
+      scene.fog.density = .0105 * k;
+      RES.renderer.setClearColor(FOG, k);
+    }
+    function update(dt) {
+      const f = 1 - Math.exp(-dt * 9);
+      ['reactor', 'oficina'].forEach(function (z) { zones[z].hi += ((hover === z ? 1 : 0) - zones[z].hi) * f; });
+      ringHi.material.opacity = .85 * zones.reactor.hi * Math.max(0, kNow);
+      offHi.userData.mat.opacity = .85 * zones.oficina.hi * Math.max(0, kNow);
+      fillL.intensity = fillL.userData.i0 * kNow * (1 + .5 * Math.max(zones.reactor.hi, zones.oficina.hi));
+    }
+    function pick(ray) {
+      const h = ray.intersectObjects([hitR, hitO], false);
+      return h.length ? h[0].object.userData.zone : null;
+    }
+
+    /* ---------- vistas de cámara ---------- */
+    const TAN = Math.tan(15 * PI / 180);
+    function view(aspect) {
+      if (aspect < .9) return { p: [23, 13.5, 33], t: [4.5, 3.2, 5] };       // vertical: oficina delante, reactor detrás
+      const t = new T.Vector3(5.5, 5.0, 4), dir = new T.Vector3(0, .13, 1).normalize();
+      const d = Math.max(36, 18.5 / (TAN * aspect), 9 / TAN);
+      return { p: t.clone().addScaledVector(dir, d).toArray(), t: t.toArray() };
+    }
+    function portada(aspect) {
+      const v = view(aspect); v.p[0] -= 6; v.p[1] += 3.5; v.p[2] += 6; return v;
+    }
+
+    return { group: group, OFFICE: OFFICE, zones: zones, view: view, portada: portada, pick: pick, collect: collect, setK: setK, update: update,
+      setHover: function (z) { hover = z; }, get hover() { return hover; }, mats: M, addLight: light, tex: tex, rnd: rnd };
+  }
+  return { build: build };
+})();
+
+</script>
+<script>
+/* ============================================================
+   Oficina de análisis: escritorio con 8 papeles (uno por gráfica), mobiliario y figura de escala
+   Oficina.build(RES, lab, lista, { shadows }) → { view(), layout(), pick(), setHover(), update(), anchor(), count }
+   ============================================================ */
+window.Oficina = (function () {
+  'use strict';
+  const T = THREE, PI = Math.PI;
+  const PW = .24, PH = .33;                       // papel (m), algo mayor que A4 para leerse bien
+  const FONT = '"Special Elite", "Courier New", Courier, monospace';
+
+  function wrap(g, text, maxW) {
+    const words = text.split(' '), out = []; let line = '';
+    words.forEach(function (w) { const t = line ? line + ' ' + w : w; if (g.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; });
+    if (line) out.push(line); return out;
+  }
+  // pictograma del tipo de gráfica, dibujado a tinta
+  function glyph(g, kind, x, y, w, h) {
+    g.save(); g.translate(x, y); g.strokeStyle = 'rgba(40,34,26,.8)'; g.fillStyle = 'rgba(40,34,26,.18)'; g.lineWidth = 3;
+    g.strokeRect(0, 0, w, h);
+    const cx = w / 2, cy = h / 2, r = Math.min(w, h) * .36;
+    if (kind === 'barrasH') { [.8, .55, .7, .4, .9].forEach(function (v, i) { g.fillRect(12, 12 + i * (h - 24) / 5, (w - 24) * v, (h - 24) / 5 - 6); g.strokeRect(12, 12 + i * (h - 24) / 5, (w - 24) * v, (h - 24) / 5 - 6); }); }
+    else if (kind === 'barrasG') { [.5, .8, .35, .65, .7, .45].forEach(function (v, i) { const bw = (w - 24) / 6 - 4, bx = 12 + i * ((w - 24) / 6) + (i % 2 ? -2 : 2); g.fillRect(bx, h - 12 - (h - 24) * v, bw, (h - 24) * v); g.strokeRect(bx, h - 12 - (h - 24) * v, bw, (h - 24) * v); }); }
+    else if (kind === 'torta' || kind === 'dona') {
+      let a = -PI / 2; [.42, .24, .16, .1, .08].forEach(function (v) { g.beginPath(); g.moveTo(cx, cy); g.arc(cx, cy, r, a, a + v * PI * 2); g.closePath(); g.stroke(); a += v * PI * 2; });
+      if (kind === 'dona') { g.beginPath(); g.arc(cx, cy, r * .5, 0, PI * 2); g.fillStyle = '#e9e1cc'; g.fill(); g.stroke(); }
+    } else if (kind === 'linea' || kind === 'doble') {
+      g.beginPath(); for (let i = 0; i <= 40; i++) { const t = i / 40, s = 1 / (1 + Math.exp(-(t - .5) * 10)); const px = 10 + t * (w - 20), py = h - 12 - s * (h - 24); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke();
+      if (kind === 'doble') { g.setLineDash([8, 6]); g.beginPath(); for (let i = 0; i <= 40; i++) { const t = i / 40, s = 1 - 1 / (1 + Math.exp(-(t - .5) * 10)); const px = 10 + t * (w - 20), py = h - 12 - s * (h - 24); i ? g.lineTo(px, py) : g.moveTo(px, py); } g.stroke(); g.setLineDash([]); }
+    } else if (kind === 'mapa') {
+      [[.12, .25, .3, .3], [.22, .6, .16, .28], [.47, .2, .2, .22], [.5, .48, .14, .3], [.68, .22, .24, .32], [.78, .66, .14, .14]].forEach(function (b) { g.beginPath(); g.ellipse(w * (b[0] + b[2] / 2), h * (b[1] + b[3] / 2), w * b[2] / 2, h * b[3] / 2, .3, 0, PI * 2); g.fill(); g.stroke(); });
+    } else if (kind === 'zonas') {
+      g.beginPath(); g.arc(cx, cy, r, 0, PI * 2); g.stroke(); g.beginPath(); g.arc(cx, cy, r * .55, 0, PI * 2); g.stroke();
+      for (let i = 0; i < 6; i++) { const a = i * PI / 3; g.beginPath(); g.moveTo(cx + Math.cos(a) * r * .55, cy + Math.sin(a) * r * .55); g.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); g.stroke(); }
+    }
+    g.restore();
+  }
+  function paperTexture(item, idx, total, rnd, aniso) {
+    const W = 768, H = Math.round(W * PH / PW), c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    // papel envejecido
+    g.fillStyle = '#e9e1cc'; g.fillRect(0, 0, W, H);
+    for (let i = 0; i < 2600; i++) { g.fillStyle = 'rgba(' + (rnd() > .5 ? '255,250,235' : '120,100,70') + ',' + (.06 * rnd()).toFixed(3) + ')'; g.fillRect(rnd() * W, rnd() * H, 2 + rnd() * 3, 2 + rnd() * 3); }
+    const e = g.createRadialGradient(W / 2, H / 2, W * .35, W / 2, H / 2, H * .75); e.addColorStop(0, 'rgba(120,95,60,0)'); e.addColorStop(1, 'rgba(120,95,60,.28)');
+    g.fillStyle = e; g.fillRect(0, 0, W, H);
+    g.strokeStyle = 'rgba(110,90,60,.12)'; g.lineWidth = 2; g.beginPath(); g.moveTo(0, H * .5 + 3); g.lineTo(W, H * .5 - 2); g.stroke();   // doblez
+    const ink = '#2a241b', ink2 = 'rgba(42,36,27,.62)', M = 52;
+    g.fillStyle = ink; g.textBaseline = 'alphabetic';
+    g.font = '26px ' + FONT; g.fillText('INSTITUTO KURCHÁTOV', M, 78);
+    g.fillStyle = ink2; g.fillText('PROYECTO Ω · ARCHIVO', M, 112);
+    g.textAlign = 'right'; g.fillText('HOJA ' + item.n + ' / ' + String(total).padStart(2, '0'), W - M, 78); g.textAlign = 'left';
+    g.fillStyle = ink; g.fillRect(M, 134, W - 2 * M, 3); g.fillRect(M, 142, W - 2 * M, 1.5);
+    // número grande y título
+    g.font = '170px ' + FONT; g.fillText(item.n, M - 6, 316);
+    g.font = '58px ' + FONT;
+    const tl = wrap(g, item.titulo, W - 2 * M); tl.forEach(function (l, i) { g.fillText(l, M, 400 + i * 64); });
+    let y = 400 + tl.length * 64 + 6;
+    g.font = '32px ' + FONT; g.fillStyle = ink2;
+    wrap(g, item.sub, W - 2 * M).forEach(function (l) { g.fillText(l, M, y); y += 40; });
+    g.fillText('Tipo: ' + item.tipo.toLowerCase(), M, y + 6); y += 34;
+    // pictograma y líneas mecanografiadas (relleno sin texto)
+    glyph(g, item.glyph, M, y + 34, W - 2 * M, 250); y += 34 + 250 + 46;
+    g.fillStyle = 'rgba(42,36,27,.22)';
+    for (let i = 0; y + i * 30 < H - 70; i++) { const w = (W - 2 * M) * (i % 4 === 3 ? .45 + rnd() * .2 : .82 + rnd() * .18); g.fillRect(M, y + i * 30, w, 9); }
+    // sello «ARCHIVO»
+    g.save(); g.translate(W - 210, 236); g.rotate(-.21 + (idx % 3 - 1) * .05);
+    g.strokeStyle = 'rgba(163,48,38,.82)'; g.fillStyle = 'rgba(163,48,38,.82)'; g.lineWidth = 7; g.strokeRect(-150, -52, 300, 104);
+    g.lineWidth = 2.5; g.strokeRect(-138, -41, 276, 82); g.font = '64px ' + FONT; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('ARCHIVO', 0, 4);
+    g.globalCompositeOperation = 'destination-out';
+    for (let i = 0; i < 700; i++) { g.fillStyle = 'rgba(0,0,0,' + (.5 * rnd()).toFixed(2) + ')'; g.fillRect(-160 + rnd() * 320, -60 + rnd() * 120, 2 + rnd() * 4, 2 + rnd() * 4); }
+    g.restore();
+    // el sello resta tinta y deja transparente; se recompone sobre papel
+    const out = document.createElement('canvas'); out.width = W; out.height = H; const o = out.getContext('2d');
+    o.fillStyle = '#e9e1cc'; o.fillRect(0, 0, W, H); o.drawImage(c, 0, 0);
+    const t = new T.CanvasTexture(out); t.encoding = T.sRGBEncoding; t.anisotropy = aniso; return t;
+  }
+
+  function build(RES, lab, lista, opt) {
+    opt = opt || {};
+    const O = lab.OFFICE, g = new T.Group(); g.name = 'Oficina'; lab.group.add(g);
+    const rnd = lab.rnd, sh = !!opt.shadows;
+    const lin = function (c) { return new T.Color(c).convertSRGBToLinear(); };
+    const std = function (c, r, m, ex) { return new T.MeshStandardMaterial(Object.assign({ color: lin(c), roughness: r, metalness: m || 0 }, ex || {})); };
+    function box(w, h, d, mat, x, y, z, parent) {
+      const o = new T.Mesh(new T.BoxGeometry(w, h, d), mat); o.position.set(x, y, z); o.castShadow = o.receiveShadow = sh; (parent || g).add(o); return o;
+    }
+    const wood = std(0x5e3f26, .62), woodL = std(0x7a5634, .7), steel = std(0x3b4248, .5, .6), green = std(0x56624f, .6, .25),
+      felt = std(0x2f4a3c, .95), cream = std(0xc9c2ae, .9), copper = std(0xb4672e, .35, 1), glass = std(0x9fb2bb, .1, 0, { transparent: true, opacity: .22, depthWrite: false }),
+      black = std(0x1b1d1f, .6, .2);
+    const cx = (O.x0 + O.x1) / 2, cz = (O.z0 + O.z1) / 2, w = O.x1 - O.x0, d = O.z1 - O.z0;
+
+    /* ---------- suelo y tabiques ---------- */
+    const linoT = lab.tex(512, 512, function (c, W, H) {
+      c.fillStyle = '#5a5340'; c.fillRect(0, 0, W, H); for (let i = 0; i < 3000; i++) { c.fillStyle = 'rgba(0,0,0,' + (.08 * rnd()).toFixed(3) + ')'; c.fillRect(rnd() * W, rnd() * H, 3, 3); }
+      c.strokeStyle = 'rgba(20,18,12,.45)'; c.lineWidth = 2; for (let i = 0; i <= W; i += 128) { c.beginPath(); c.moveTo(i, 0); c.lineTo(i, H); c.stroke(); c.beginPath(); c.moveTo(0, i); c.lineTo(W, i); c.stroke(); }
+    }, [w / 2, d / 2]);
+    const lino = new T.Mesh(new T.PlaneGeometry(w, d), std(0xffffff, .8, 0, { map: linoT })); lino.rotation.x = -PI / 2; lino.position.set(cx, .008, cz); lino.receiveShadow = sh; g.add(lino);
+    box(w, 2.6, .12, std(0x8a8d84, .9), cx, 1.3, O.z0);                                   // muro del fondo
+    box(w, .12, .16, wood, cx, 2.62, O.z0);
+    [[O.x0, 1], [O.x1, -1]].forEach(function (s) {                                          // tabiques laterales: zócalo + vidrio
+      const x = s[0];
+      box(.1, 1.05, d, green, x, .525, cz);
+      const gl = new T.Mesh(new T.PlaneGeometry(d, 1.3), glass); gl.position.set(x, 1.7, cz); gl.rotation.y = PI / 2; g.add(gl);
+      box(.12, .08, d, wood, x, 1.06, cz); box(.12, .08, d, wood, x, 2.38, cz);
+      for (let z = O.z0; z <= O.z1 + .01; z += d / 4) box(.1, 2.4, .1, wood, x, 1.2, z);
+    });
+
+    /* ---------- escritorio ---------- */
+    const DT = .78, D = new T.Vector3(cx, DT, cz + .2);
+    box(2.0, .045, 1.0, wood, D.x, DT - .0225, D.z);
+    box(.48, .72, .92, woodL, D.x + .72, .36, D.z);                                         // cajonera
+    [.12, .36, .58].forEach(function (y) { box(.04, .02, .14, copper, D.x + .72, y + .02, D.z + .47); });
+    [[-.95, -.45], [-.95, .45]].forEach(function (p) { box(.05, DT - .05, .05, steel, D.x + p[0], (DT - .05) / 2, D.z + p[1]); });
+    box(.05, .05, .9, steel, D.x - .95, .12, D.z);
+    const pad = box(1.62, .006, .9, felt, D.x - .04, DT + .003, D.z); pad.castShadow = false;
+    // lámpara de escritorio (esquina trasera izquierda, fuera de la zona de papeles)
+    (function () {
+      const L = new T.Group(); L.position.set(D.x - .93, DT, D.z - .43); g.add(L);
+      const base = new T.Mesh(new T.CylinderGeometry(.09, .1, .03, 20), black); base.position.y = .015; L.add(base);
+      const a1 = new T.Mesh(new T.CylinderGeometry(.012, .012, .42, 8), black); a1.position.set(0, .22, 0); a1.rotation.z = -.2; L.add(a1);
+      const a2 = new T.Mesh(new T.CylinderGeometry(.012, .012, .3, 8), black); a2.position.set(.08, .45, .07); a2.rotation.set(.9, 0, -.6); L.add(a2);
+      const shade = new T.Mesh(new T.ConeGeometry(.11, .16, 20, 1, true), std(0x3f5a45, .45, .4, { side: T.DoubleSide })); shade.position.set(.1, .47, .07); shade.rotation.set(.35, 0, -.55); L.add(shade);
+      const bulb = new T.Mesh(new T.SphereGeometry(.04, 12, 8), new T.MeshBasicMaterial({ color: lin(0xffe2a8) })); bulb.position.set(.11, .44, .08); L.add(bulb);
+      const pl = lab.addLight(new T.PointLight(0xffd59c, .7, 3.5, 2), .7); pl.position.set(D.x - .8, DT + .4, D.z - .33);
+    })();
+    // teléfono de disco y carpetas (atrezo)
+    box(.2, .08, .22, black, D.x + .82, DT + .04, D.z - .3); box(.24, .045, .06, black, D.x + .82, DT + .1, D.z - .3);
+    const dial = new T.Mesh(new T.CylinderGeometry(.06, .06, .01, 20), cream); dial.position.set(D.x + .82, DT + .085, D.z - .22); dial.rotation.x = -.3; g.add(dial);
+    [0, 1, 2].forEach(function (i) { const f = box(.26, .025, .34, std([0x8a6f45, 0x6f6f5a, 0x7d5e3a][i], .85), D.x + .82, DT + .015 + i * .026, D.z + .18); f.rotation.y = (i - 1) * .08; });
+
+    /* ---------- silla ---------- */
+    (function () {
+      const C = new T.Group(); C.position.set(D.x - .1, 0, D.z + .82); C.rotation.y = .25; g.add(C);
+      box(.46, .04, .44, wood, 0, .46, 0, C);
+      [[-.2, -.19], [.2, -.19], [-.2, .19], [.2, .19]].forEach(function (p) { box(.035, .46, .035, wood, p[0], .23, p[1], C); });
+      box(.035, .5, .035, wood, -.2, .72, .19, C); box(.035, .5, .035, wood, .2, .72, .19, C); box(.44, .16, .03, wood, 0, .86, .19, C);
+    })();
+
+    /* ---------- archivadores y tablero de avisos ---------- */
+    [O.x0 + .55, O.x0 + 1.3].forEach(function (x) {
+      box(.7, 1.33, .62, green, x, .665, O.z0 + .38);
+      for (let k = 0; k < 4; k++) { box(.66, .006, .01, black, x, .3 + k * .32, O.z0 + .695); box(.12, .025, .03, copper, x, .2 + k * .32, O.z0 + .71); }
+    });
+    const boardT = lab.tex(1024, 512, function (c, W, H) {
+      c.fillStyle = '#9a7650'; c.fillRect(0, 0, W, H); for (let i = 0; i < 6000; i++) { c.fillStyle = 'rgba(' + (rnd() > .5 ? '60,40,20' : '200,170,120') + ',' + (.25 * rnd()).toFixed(2) + ')'; c.fillRect(rnd() * W, rnd() * H, 2, 2); }
+      const notes = [['AVISO', 64, 50, 250, 300, -.03], ['PROYECTO Ω', 360, 40, 280, 200, .02], ['INSTITUTO KURCHÁTOV', 700, 70, 270, 330, .03], ['TURNOS', 370, 280, 240, 190, -.04]];
+      notes.forEach(function (n) {
+        c.save(); c.translate(n[1] + n[3] / 2, n[2] + n[4] / 2); c.rotate(n[5]);
+        c.fillStyle = 'rgba(0,0,0,.25)'; c.fillRect(-n[3] / 2 + 6, -n[4] / 2 + 8, n[3], n[4]);
+        c.fillStyle = '#ece4cf'; c.fillRect(-n[3] / 2, -n[4] / 2, n[3], n[4]);
+        c.fillStyle = '#2a241b'; c.font = '26px ' + FONT; c.textAlign = 'center'; c.fillText(n[0], 0, -n[4] / 2 + 40);
+        c.fillStyle = 'rgba(42,36,27,.3)'; for (let y = -n[4] / 2 + 64; y < n[4] / 2 - 18; y += 22) c.fillRect(-n[3] / 2 + 18, y, (n[3] - 36) * (.6 + rnd() * .4), 7);
+        c.fillStyle = '#a33026'; c.beginPath(); c.arc(0, -n[4] / 2 + 10, 8, 0, PI * 2); c.fill();
+        c.restore();
+      });
+    });
+    const board = new T.Mesh(new T.PlaneGeometry(2.2, 1.1), std(0xffffff, .9, 0, { map: boardT })); board.position.set(cx + 1.4, 1.65, O.z0 + .07); g.add(board);
+    box(2.3, .06, .05, wood, cx + 1.4, 2.23, O.z0 + .08); box(2.3, .06, .05, wood, cx + 1.4, 1.07, O.z0 + .08);
+
+    /* ---------- figura humana de 1,75 m (referencia de escala) ---------- */
+    const fig = RES.M.figure.clone(true);
+    fig.traverse(function (o) { if (o.isMesh) { o.material = o.material.clone(); o.castShadow = sh; } });
+    fig.position.set(O.x0 + 1.3, 0, O.z1 - .9); fig.rotation.y = .5; g.add(fig);
+
+    /* ---------- papeles ---------- */
+    const aniso = RES.renderer.capabilities.getMaxAnisotropy();
+    const geo = new T.PlaneGeometry(PW, PH);
+    const papers = lista.map(function (item, i) {
+      const m = new T.MeshStandardMaterial({ map: paperTexture(item, i, lista.length, rnd, aniso), color: lin(0xc4c4c4), roughness: .92, emissive: lin(0xffe6b8), emissiveIntensity: 0 });
+      const p = new T.Mesh(geo, m); p.castShadow = sh; p.receiveShadow = sh; p.userData.idx = i;
+      p.userData.j = { x: (rnd() - .5) * .024, z: (rnd() - .5) * .02, r: (rnd() - .5) * .1 };
+      p.userData.h = 0; g.add(p); return p;
+    });
+    let orient = '', hover = -1;
+    function layout(aspect) {
+      const o = aspect >= 1 ? 'h' : 'v'; if (o === orient) return; orient = o;
+      papers.forEach(function (p, i) {
+        const j = p.userData.j, r = Math.floor(i / (o === 'h' ? 4 : 2)), c = i % (o === 'h' ? 4 : 2);
+        let x, z, ry;
+        if (o === 'h') { x = -.54 + c * .36; z = -.2 + r * .41; ry = 0; }            // 4 × 2, se lee desde el frente (+z)
+        else { x = -.57 + r * .38; z = .15 - c * .3; ry = PI / 2; }                  // 2 × 4, se lee desde el extremo (+x)
+        p.userData.base = new T.Vector3(D.x + x + j.x, DT + .008 + i * .0004, D.z + z + j.z); p.userData.ry = ry + j.r;
+        place(p);
+      });
+    }
+    function place(p) {
+      const h = p.userData.h, b = p.userData.base;
+      p.position.set(b.x, b.y + .05 * h, b.z);
+      p.rotation.set(-PI / 2 + .16 * h, p.userData.ry, 0, 'YXZ');
+      p.material.emissiveIntensity = .1 * h;
+    }
+    function update(dt, reduce) {
+      let moving = false; const f = reduce ? 1 : 1 - Math.exp(-dt * 12);
+      papers.forEach(function (p, i) {
+        const t = i === hover ? 1 : 0, h = p.userData.h;
+        if (Math.abs(t - h) > .002) { p.userData.h = h + (t - h) * f; place(p); moving = true; }
+        else if (h !== t) { p.userData.h = t; place(p); moving = true; }
+      });
+      return moving;
+    }
+    const TAN = Math.tan(15 * PI / 180);
+    function view(aspect, ui) {
+      ui = ui || 1.18;                                       // margen para la interfaz superior e inferior
+      if (aspect >= 1) {
+        const dist = Math.max(.82 * ui / (TAN * aspect), .5 * ui / TAN), el = 54 * PI / 180;
+        return { p: [D.x, DT + dist * Math.sin(el), D.z + .02 + dist * Math.cos(el)], t: [D.x, DT, D.z + .02] };
+      }
+      const dist = Math.max(.36 * ui / (TAN * aspect), .82 * ui / TAN), el = 62 * PI / 180;
+      return { p: [D.x + dist * Math.cos(el), DT + dist * Math.sin(el), D.z], t: [D.x, DT, D.z] };
+    }
+    function pick(ray) { const h = ray.intersectObjects(papers, false); return h.length ? h[0].object.userData.idx : -1; }
+    // punto superior del papel (para la etiqueta flotante)
+    function anchor(i) { const p = papers[i]; return new T.Vector3(0, PH / 2, 0).applyMatrix4(p.matrixWorld); }
+    return { group: g, view: view, layout: layout, pick: pick, update: update, anchor: anchor, count: papers.length,
+      setHover: function (i) { hover = i; }, get hover() { return hover; } };
+  }
+  return { build: build };
+})();
+
+</script>
+<script>
+/* ============================================================
+   Visor de gráficas (dossier del archivo). Cada gráfica es un fragmento HTML incrustado por build_site.py;
+   aquí se envuelve en una página completa (variables CSS + data-mode) y se carga en un iframe con srcdoc.
+   ============================================================ */
+window.Grafica = (function () {
+  'use strict';
+  const LISTA = [
+    { n: '01', archivo: 'indice_poder_global_animated.html', titulo: 'Poder global', sub: 'Índice de poder global (IPG), 1986 frente a 2082', tipo: 'Barras horizontales', glyph: 'barrasH' },
+    { n: '02', archivo: 'indice_adaptacion_biologica_animated.html', titulo: 'Adaptación biológica', sub: 'Índice de adaptación biológica de especies', tipo: 'Barras agrupadas', glyph: 'barrasG' },
+    { n: '03', archivo: 'composicion_atmosferica_2082_animated.html', titulo: 'Atmósfera 2082', sub: 'Composición atmosférica en 2082', tipo: 'Torta', glyph: 'torta' },
+    { n: '04', archivo: 'poder_economia_aerhyn_2082_animated.html', titulo: 'Economía Aerhyn', sub: 'Poder en la economía global de Aerhyn, 2082', tipo: 'Dona', glyph: 'dona' },
+    { n: '05', archivo: 'concentracion_hydraether_1986_2082_animated.html', titulo: 'Hydraether 1986–2082', sub: 'Concentración de Hydraether entre 1986 y 2082', tipo: 'Línea sigmoide', glyph: 'linea' },
+    { n: '06', archivo: 'evolucion_homo_sapiens_homo_aeris_animated.html', titulo: 'Evolución Homo', sub: 'Homo sapiens y Homo Aeris, 1986–2082', tipo: 'Doble línea cruzada', glyph: 'doble' },
+    { n: '07', archivo: 'concentracion_hae_mapa_mundial_v2.html', titulo: 'HAE por sector', sub: 'Concentración de HAE por sector', tipo: 'Mapa mundial', glyph: 'mapa' },
+    { n: '08', archivo: 'sectores_urbanos_aerhyn_mapa_zonas.html', titulo: 'Sectores Aerhyn', sub: 'Sectores urbanos y zonas HAE de Aerhyn', tipo: 'Mapa de zonas', glyph: 'zonas' }
+  ];
+  const $ = function (s) { return document.querySelector(s); };
+  let datos = null, idx = -1, blobUrl = null, onClose = null, lastFocus = null;
+
+  function fragmento(archivo) {
+    if (!datos) { const el = $('#graficas-datos'); datos = el ? JSON.parse(el.textContent) : {}; }
+    return datos[archivo] || '<p style="font:16px system-ui;padding:24px">No se encontró la gráfica ' + archivo + '.</p>';
+  }
+  function modo() {
+    const t = document.documentElement.getAttribute('data-theme');
+    if (t === 'dark' || t === 'light') return t;
+    return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  // página completa: define las variables que las gráficas usan y data-mode según el tema de la página
+  function envoltorio(item) {
+    const fit = '<script>(function(){var c=document.querySelector(".card");if(!c)return;var mw=parseFloat(getComputedStyle(c).maxWidth)||720;' +
+      'function fit(){c.style.maxWidth="";for(var k=0;k<2;k++){var r=c.getBoundingClientRect(),av=innerHeight-44;if(r.height>av)c.style.maxWidth=Math.max(280,Math.floor(r.width*av/r.height))+"px";}}' +
+      'fit();addEventListener("resize",fit);' +
+      'if(!matchMedia("(prefers-reduced-motion: reduce)").matches){var b=document.getElementById("btnPlay");if(b)setTimeout(function(){b.click();},450);}})();<\/script>';
+    return '<!doctype html><html lang="es" data-mode="' + modo() + '"><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width,initial-scale=1"><title>' + item.n + ' · ' + item.titulo + ' — Archivo del Proyecto Ω</title><style>' +
+      ':root{--surface-1:#f1ece0;--surface-2:#fbf8f1;--border:rgba(58,48,30,.2);--border-strong:rgba(58,48,30,.42);--text-primary:#1f1b14;' +
+      '--font-sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--radius:4px;color-scheme:light}' +
+      'html[data-mode="dark"]{--surface-1:#17191c;--surface-2:#202327;--border:rgba(236,228,210,.14);--border-strong:rgba(236,228,210,.34);--text-primary:#ece6d8;color-scheme:dark}' +
+      'html{background:var(--surface-1)}</style></head><body>' + fragmento(item.archivo) + fit + '</body></html>';
+  }
+
+  const el = {};
+  function init() {
+    el.root = $('#dossier'); el.frame = $('#dosFrame'); el.num = $('#dosNum'); el.title = $('#dosTitle'); el.sub = $('#dosSub');
+    el.prev = $('#dosPrev'); el.next = $('#dosNext'); el.back = $('#dosBack'); el.solo = $('#dosSolo');
+    el.prev.addEventListener('click', function () { step(-1); });
+    el.next.addEventListener('click', function () { step(1); });
+    el.back.addEventListener('click', close);
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change', refresh);
+    new MutationObserver(refresh).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  }
+  function load() {
+    const item = LISTA[idx], html = envoltorio(item);
+    el.num.textContent = item.n + ' / ' + String(LISTA.length).padStart(2, '0');
+    el.title.textContent = item.titulo; el.sub.textContent = item.sub + ' · ' + item.tipo.toLowerCase();
+    el.frame.title = 'Gráfica ' + item.n + ': ' + item.titulo;
+    el.frame.srcdoc = html;
+    if (blobUrl) URL.revokeObjectURL(blobUrl);
+    blobUrl = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
+    el.solo.href = blobUrl;
+    el.prev.setAttribute('aria-label', 'Anterior: ' + LISTA[(idx + LISTA.length - 1) % LISTA.length].titulo);
+    el.next.setAttribute('aria-label', 'Siguiente: ' + LISTA[(idx + 1) % LISTA.length].titulo);
+  }
+  function open(i, cb) {
+    if (!el.root) init();
+    idx = i; onClose = cb || null; lastFocus = document.activeElement;
+    el.root.hidden = false; el.root.classList.add('open'); load(); el.back.focus();
+  }
+  function step(d) { if (idx < 0) return; idx = (idx + d + LISTA.length) % LISTA.length; load(); }
+  function close() {
+    if (idx < 0) return;
+    const i = idx; idx = -1; el.root.classList.remove('open'); el.root.hidden = true; el.frame.srcdoc = '';
+    if (onClose) onClose(i);
+  }
+  function refresh() { if (idx >= 0) load(); }
+  return { LISTA: LISTA, open: open, close: close, step: step, isOpen: function () { return idx >= 0; }, current: function () { return idx; }, modo: modo };
+})();
+
+</script>
+<script>
+/* ============================================================
+   Experiencia: un solo renderer (el del visor) y un solo bucle con cinco modos
+   portada · laboratorio · reactor · oficina · grafica
+   ============================================================ */
+(function () {
+  'use strict';
+  const $ = function (s) { return document.querySelector(s); };
+  const app = $('#app'), carga = $('#carga'), bar = $('#cargaBar'), cargaTxt = $('#cargaTxt');
+  const reduceQ = matchMedia('(prefers-reduced-motion: reduce)');
+  const touch = matchMedia('(pointer: coarse)').matches, small = Math.min(screen.width, screen.height) < 820;
+  const lowEnd = touch || small;
+  let RES, lab, ofi, T, renderer, camera, controls, mode = 'carga';
+
+  function progress(f, txt) { bar.style.width = Math.round(f * 100) + '%'; carga.setAttribute('aria-valuenow', Math.round(f * 100)); if (txt) cargaTxt.textContent = txt; }
+  function frame() { return new Promise(function (r) { requestAnimationFrame(function () { setTimeout(r, 0); }); }); }
+  function fail(msg) { carga.classList.add('error'); cargaTxt.textContent = msg; }
+  function fonts() {
+    if (!document.fonts || !document.fonts.load) return Promise.resolve();
+    const all = Promise.all(['40px "Special Elite"', '600 40px "Barlow Condensed"'].map(function (f) { return document.fonts.load(f, 'ΩÁ'); }));
+    return Promise.race([all, new Promise(function (r) { setTimeout(r, 3000); })]).catch(function () {});
+  }
+
+  async function boot() {
+    if (!window.THREE || !THREE.OrbitControls) { fail('No se pudo cargar Three.js. Revisa la conexión a internet y recarga la página.'); return; }
+    T = THREE;
+    const steps = [
+      ['Construyendo el Resonador Ω', function () {
+        RES = window.ResonadorApp({ external: true }); renderer = RES.renderer; camera = RES.camera; controls = RES.controls;
+        if (!lowEnd) { renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap; renderer.shadowMap.autoUpdate = false; }
+        RES.M.root.traverse(function (o) { if (o.isMesh) o.castShadow = !lowEnd; });
+      }],
+      ['Cargando tipografías', fonts],
+      ['Levantando la nave del laboratorio', function () { lab = Laboratorio.build(RES, { shadows: !lowEnd }); }],
+      ['Preparando la oficina de análisis', function () {
+        ofi = Oficina.build(RES, lab, Grafica.LISTA, { shadows: !lowEnd }); lab.collect(); ofi.layout(aspect());
+        papersUI();
+      }],
+      ['Compilando materiales', function () {
+        lab.setK(1); const v = lab.portada(aspect()); setCam(v);
+        renderer.localClippingEnabled = false; renderer.compile(RES.scene, camera);
+        renderer.localClippingEnabled = true; renderer.compile(RES.scene, camera);
+      }]
+    ];
+    try {
+      for (let i = 0; i < steps.length; i++) { progress(i / steps.length, steps[i][0] + '…'); await frame(); await steps[i][1](); }
+    } catch (e) { console.error(e); fail('No se pudo construir la escena: ' + (e && e.message ? e.message : e)); return; }
+    progress(1, 'Listo');
+    setMode('portada'); requestAnimationFrame(loop);
+    await frame(); carga.classList.add('fuera'); setTimeout(function () { carga.hidden = true; }, 600);
+    $('#btnIniciar').disabled = false; $('#btnIniciar').focus({ preventScroll: true });
+  }
+
+  /* ---------- cámara de la experiencia (fuera del modo reactor) ---------- */
+  const cam = { tw: null, t: null, off: null, par: { x: 0, y: 0, sx: 0, sy: 0 } };
+  function aspect() { return Math.max(.2, app.clientWidth / Math.max(1, app.clientHeight)); }
+  function setCam(v) { if (!cam.t) { cam.t = new T.Vector3(); cam.off = new T.Vector3(); } camera.position.fromArray(v.p); cam.t.fromArray(v.t); camera.lookAt(cam.t); }
+  function goal() {
+    const a = aspect();
+    if (mode === 'oficina' || mode === 'grafica') return ofi.view(a);
+    if (mode === 'portada') return lab.portada(a);
+    return lab.view(a);
+  }
+  function ease(f) { return f < .5 ? 4 * f * f * f : 1 - Math.pow(-2 * f + 2, 3) / 2; }
+  function flyTo(dur) {
+    const v = goal();
+    cam.tw = { p0: camera.position.clone(), t0: cam.t.clone(), p1: new T.Vector3().fromArray(v.p), t1: new T.Vector3().fromArray(v.t), s: performance.now(), d: reduceQ.matches ? 1 : dur };
+  }
+  function driveCamera(now, dt) {
+    const p = cam.par, k = 1 - Math.exp(-dt * 3);
+    const allowPar = !reduceQ.matches && !touch && (mode === 'laboratorio' || mode === 'portada');
+    p.sx += ((allowPar ? p.x : 0) - p.sx) * k; p.sy += ((allowPar ? p.y : 0) - p.sy) * k;
+    if (cam.tw) {
+      const f = Math.min(1, (now - cam.tw.s) / cam.tw.d), e = ease(f);
+      camera.position.lerpVectors(cam.tw.p0, cam.tw.p1, e); cam.t.lerpVectors(cam.tw.t0, cam.tw.t1, e);
+      if (f >= 1) cam.tw = null;
+    } else {
+      const v = goal(); camera.position.fromArray(v.p); cam.t.fromArray(v.t);
+      if (mode === 'portada' && !reduceQ.matches) { camera.position.x += Math.sin(now / 9000) * 2.2; camera.position.y += Math.sin(now / 6500) * .5; }
+    }
+    if (mode === 'laboratorio' || mode === 'portada') { camera.position.x += p.sx * 1.4; camera.position.y -= p.sy * .7; }
+    camera.lookAt(cam.t);
+  }
+
+  /* ---------- modos ---------- */
+  const live = $('#vivo');
+  function setMode(m) {
+    mode = m;
+    ['portada', 'laboratorio', 'reactor', 'oficina', 'grafica'].forEach(function (k) { app.classList.toggle('modo-' + k, k === m); });
+    $('#portada').hidden = m !== 'portada';
+    $('#labUI').hidden = m !== 'laboratorio';
+    $('#ofiUI').hidden = !(m === 'oficina');
+    renderer.domElement.style.cursor = m === 'reactor' ? '' : 'default';
+    lab.setHover(null); ofi.setHover(-1); tip.hidden = true;
+  }
+  function say(t) { live.textContent = t; }
+  function iniciar() {
+    setMode('laboratorio'); flyTo(2400);
+    say('Laboratorio del Proyecto Ω. Dos zonas: el reactor y la oficina de análisis.');
+    setTimeout(function () { $('#zReactor').focus({ preventScroll: true }); }, 50);
+  }
+  function irReactor() {
+    if (mode !== 'laboratorio') return;
+    setMode('reactor'); cam.tw = null;
+    controls.target.copy(cam.t);
+    if (reduceQ.matches) { camera.position.fromArray(RES.home.p); controls.target.fromArray(RES.home.t); }
+    RES.enter(); say('Reactor Ω. Pestañas del 1 al 6; Escape para volver al laboratorio.');
+    $('#tab-general').focus({ preventScroll: true });
+  }
+  function salirReactor() {
+    RES.exit(); cam.t.copy(controls.target); camera.lookAt(cam.t);
+    setMode('laboratorio'); flyTo(1900); say('Laboratorio.');
+    $('#zReactor').focus({ preventScroll: true });
+  }
+  function irOficina() {
+    if (mode !== 'laboratorio') return;
+    setMode('oficina'); flyTo(1900); say('Oficina de análisis: ocho papeles, uno por gráfica.');
+    $('#papeles button').focus({ preventScroll: true });
+  }
+  function salirOficina() { setMode('laboratorio'); flyTo(1900); say('Laboratorio.'); $('#zOficina').focus({ preventScroll: true }); }
+  function abrir(i) {
+    if (mode !== 'oficina') return;
+    setMode('grafica');
+    Grafica.open(i, function (j) { setMode('oficina'); const b = document.querySelectorAll('#papeles button')[j]; if (b) b.focus({ preventScroll: true }); });
+  }
+
+  /* ---------- interfaz HTML ---------- */
+  $('#btnIniciar').addEventListener('click', iniciar);
+  $('#zReactor').addEventListener('click', irReactor);
+  $('#zOficina').addEventListener('click', irOficina);
+  [['#zReactor', 'reactor'], ['#zOficina', 'oficina']].forEach(function (z) {
+    const b = $(z[0]);
+    ['pointerenter', 'focus'].forEach(function (ev) { b.addEventListener(ev, function () { if (ev === 'pointerenter' || b.matches(':focus-visible')) lab.setHover(z[1]); }); });
+    ['pointerleave', 'blur'].forEach(function (ev) { b.addEventListener(ev, function () { if (lab.hover === z[1]) lab.setHover(null); }); });
+  });
+  $('#btnLab').addEventListener('click', salirReactor);
+  $('#ofiBack').addEventListener('click', salirOficina);
+  const tip = $('#papelTip');
+  function papersUI() {
+    const nav = $('#papeles');
+    Grafica.LISTA.forEach(function (it, i) {
+      const b = document.createElement('button'); b.type = 'button';
+      b.innerHTML = '<span class="pn">' + it.n + '</span><span class="pt">' + it.titulo + '</span>';
+      b.setAttribute('aria-label', 'Abrir gráfica ' + it.n + ': ' + it.titulo);
+      b.addEventListener('click', function () { abrir(i); });
+      ['pointerenter', 'focus'].forEach(function (ev) { b.addEventListener(ev, function () { if (ev === 'pointerenter' || b.matches(':focus-visible')) ofi.setHover(i); }); });
+      ['pointerleave', 'blur'].forEach(function (ev) { b.addEventListener(ev, function () { if (ofi.hover === i) ofi.setHover(-1); }); });
+      nav.appendChild(b);
+    });
+  }
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      if (mode === 'reactor') { e.preventDefault(); salirReactor(); }
+      else if (mode === 'oficina') { e.preventDefault(); salirOficina(); }
+      else if (mode === 'grafica') { e.preventDefault(); Grafica.close(); }
+    } else if (mode === 'grafica' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      e.preventDefault(); Grafica.step(e.key === 'ArrowLeft' ? -1 : 1);
+    }
+  });
+
+  /* ---------- puntero sobre el canvas: solo el reactor, la oficina y los papeles responden ---------- */
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(); let down = null;
+  const view = $('#view');
+  function aim(e) { const r = view.getBoundingClientRect(); ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1); ray.setFromCamera(ndc, camera); }
+  function hoverAt(e) {
+    if (cam.tw) return;
+    if (mode === 'laboratorio') { aim(e); const z = lab.pick(ray); lab.setHover(z); renderer.domElement.style.cursor = z ? 'pointer' : 'default'; }
+    else if (mode === 'oficina') { aim(e); const i = ofi.pick(ray); ofi.setHover(i); renderer.domElement.style.cursor = i >= 0 ? 'pointer' : 'default'; }
+  }
+  view.addEventListener('pointermove', function (e) {
+    const r = view.getBoundingClientRect(); cam.par.x = (e.clientX - r.left) / r.width * 2 - 1; cam.par.y = (e.clientY - r.top) / r.height * 2 - 1;
+    if (e.pointerType === 'mouse') hoverAt(e);
+  });
+  view.addEventListener('pointerleave', function () { if (mode === 'laboratorio') lab.setHover(null); if (mode === 'oficina') ofi.setHover(-1); });
+  view.addEventListener('pointerdown', function (e) { down = [e.clientX, e.clientY]; });
+  view.addEventListener('pointerup', function (e) {
+    if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 8 || cam.tw) { down = null; return; }
+    down = null;
+    if (mode === 'laboratorio') { aim(e); const z = lab.pick(ray); if (z === 'reactor') irReactor(); else if (z === 'oficina') irOficina(); }
+    else if (mode === 'oficina') { aim(e); const i = ofi.pick(ray); if (i >= 0) abrir(i); }
+  });
+  window.addEventListener('resize', function () { if (ofi) ofi.layout(aspect()); });
+
+  /* ---------- etiquetas de zona y de papel ---------- */
+  const zR = $('#zReactor'), zO = $('#zOficina'), pv = new THREE.Vector3();
+  function toScreen(v) { pv.copy(v).project(camera); return { x: (pv.x + 1) / 2 * app.clientWidth, y: (1 - pv.y) / 2 * app.clientHeight, z: pv.z }; }
+  function placeZone(b, z) {
+    const s = toScreen(lab.zones[z].anchor), W = app.clientWidth, H = app.clientHeight, bw = b.offsetWidth, bh = b.offsetHeight;
+    const x = Math.min(W - bw / 2 - 12, Math.max(bw / 2 + 12, s.x)), y = Math.min(H - bh - 16, Math.max(96, s.y - bh - 8));
+    b.style.transform = 'translate(' + (x - bw / 2).toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+    b.classList.toggle('on', lab.hover === z);
+  }
+  function placeTip() {
+    const i = ofi.hover;
+    if (mode !== 'oficina' || i < 0 || cam.tw) { tip.hidden = true; return; }
+    const it = Grafica.LISTA[i], s = toScreen(ofi.anchor(i));
+    tip.textContent = it.n + ' · ' + it.titulo; tip.hidden = false;
+    const W = app.clientWidth, w = tip.offsetWidth;
+    tip.style.transform = 'translate(' + Math.min(W - w - 12, Math.max(12, s.x - w / 2)).toFixed(1) + 'px,' + Math.max(70, s.y - tip.offsetHeight - 10).toFixed(1) + 'px)';
+  }
+
+  /* ---------- bucle único ---------- */
+  let k = 1, last = performance.now(), dirty = true, drawn = false;
+  function loop(now) {
+    requestAnimationFrame(loop);
+    const dtr = Math.min(.5, (now - last) / 1000), dt = Math.min(.05, dtr); last = now;
+    // el laboratorio solo reaparece cuando el reactor volvió a General (la explosión supera los 30 m)
+    const c = RES.cur, settled = c.t < .03 && c.cut < .03 && c.xray < .08;
+    const kt = mode === 'reactor' ? 0 : (settled ? 1 : 0);
+    const k0 = k;
+    k = reduceQ.matches ? kt : k + (kt - k) * (1 - Math.exp(-dtr * (kt > k ? 2.6 : 5)));     // tiempo real: no se alarga si bajan los FPS
+    if (Math.abs(k - kt) < .003) k = kt;
+    lab.setK(k); RES.floor.visible = k < .5;
+    renderer.localClippingEnabled = mode === 'reactor' || c.cut > .005;
+    if (k !== k0) dirty = true;
+    if (mode !== 'reactor') driveCamera(now, dt);
+    lab.update(dt);
+    if (ofi.update(dt, reduceQ.matches)) dirty = true;
+    if (renderer.shadowMap.enabled) { renderer.shadowMap.needsUpdate = k > .01 && (dirty || !settled); dirty = false; }
+    // con la gráfica abierta la escena queda quieta detrás del dossier: no hace falta volver a dibujarla
+    if (mode === 'grafica' && drawn && !cam.tw) return;
+    RES.update(now); drawn = true;
+    if (mode === 'laboratorio') { placeZone(zR, 'reactor'); placeZone(zO, 'oficina'); }
+    placeTip();
+  }
+
+  boot();
+})();
+
 </script>
 
 </body>

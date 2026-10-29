@@ -1,7 +1,7 @@
-<title>Resonador Ω 3D</title>
+<title>Resonador Ω · Laboratorio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow+Semi+Condensed:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Barlow+Semi+Condensed:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 /* Concepto: visor de documentación técnica. Fondo de estudio gris, paneles sobrios y un único acento violeta, el color del núcleo. */
 :root {
@@ -10,16 +10,22 @@
   --f-ui: 'Barlow Semi Condensed', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --f-disp: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
   --f-mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  /* archivo del instituto (portada, laboratorio, oficina y dossier) */
+  --paper: #ece4d1; --paper-2: #e1d6bd; --paper-ink: #2a241b; --paper-ink2: #5f5443; --paper-line: #b4a585; --stamp: #a3302a; --copper: #9a5a27;
+  --shade: rgba(14,16,18,.55);
+  --f-doc: 'Special Elite', 'Courier New', Courier, monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg1: #2d353d; --bg2: #0d1116; --ink: #e8ecf0; --ink2: #a3aeb9; --panel: rgba(21,26,32,.92); --line: #39434d;
     --accent: #a597ff; --accent-ink: #0d1116; --chip: #29323b; --lead: #aab5c0; --halo: #161b21; --nb: #e8ecf0; --nbt: #0d1116; color-scheme: dark;
+    --paper: #22201c; --paper-2: #2c2924; --paper-ink: #ece4d2; --paper-ink2: #b3a68e; --paper-line: #514a3e; --stamp: #e0675a; --copper: #d08a4d; --shade: rgba(6,7,8,.66);
   }
 }
 :root[data-theme="dark"] {
   --bg1: #2d353d; --bg2: #0d1116; --ink: #e8ecf0; --ink2: #a3aeb9; --panel: rgba(21,26,32,.92); --line: #39434d;
   --accent: #a597ff; --accent-ink: #0d1116; --chip: #29323b; --lead: #aab5c0; --halo: #161b21; --nb: #e8ecf0; --nbt: #0d1116; color-scheme: dark;
+  --paper: #22201c; --paper-2: #2c2924; --paper-ink: #ece4d2; --paper-ink2: #b3a68e; --paper-line: #514a3e; --stamp: #e0675a; --copper: #d08a4d; --shade: rgba(6,7,8,.66);
 }
 html, body { height: 100%; }
 body { margin: 0; background: var(--bg2); color: var(--ink); font: 400 14px/1.45 var(--f-ui); overflow: hidden; }
@@ -88,6 +94,99 @@ header > * { pointer-events: auto; }
 .hint { position: absolute; left: 50%; transform: translateX(-50%); bottom: 14px; z-index: 1; white-space: nowrap; font: 400 11px var(--f-mono); color: var(--ink2); text-align: right; pointer-events: none; }
 @media (max-width: 820px) { #inset { transform: scale(.72); } .hint { display: none; } .brand h1 { font-size: 21px; } #app.pan #info { left: 16px; width: calc(100% - 32px); } }
 @media (prefers-reduced-motion: reduce) { #inset { transition: none; } }
+/* ============ Experiencia: modos y lenguaje de archivo del instituto ============ */
+#app:not(.modo-reactor) > header, #app:not(.modo-reactor) > #panel, #app:not(.modo-reactor) > .hint,
+#app:not(.modo-reactor) > #info, #app:not(.modo-reactor) > #inset, #app:not(.modo-reactor) > #overlay { display: none !important; }
+#app.modo-reactor > header, #app.modo-reactor > #info { animation: aparecer .6s .55s both; }
+@keyframes aparecer { from { opacity: 0; } }
+#app:not(.modo-reactor) #view canvas { cursor: default; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.kick { margin: 0; font: 400 11.5px/1.3 var(--f-doc); letter-spacing: .08em; text-transform: uppercase; color: var(--paper-ink2); }
+.sello { display: inline-block; font: 400 15px/1 var(--f-doc); letter-spacing: .16em; color: var(--stamp); border: 2px solid var(--stamp); outline: 1px solid var(--stamp); outline-offset: 2px; padding: 5px 9px 4px; transform: rotate(-7deg); opacity: .85; }
+.doc-btn { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font: 400 14px/1.2 var(--f-doc); color: var(--paper-ink); background: var(--paper); border: 1px solid var(--paper-line); border-radius: 2px; padding: 8px 13px; cursor: pointer; text-decoration: none; min-height: 40px; }
+.doc-btn:hover { background: var(--paper-2); }
+.doc-btn:focus-visible, .zona:focus-visible, #papeles button:focus-visible, #btnIniciar:focus-visible, .tool.lab-back:focus-visible { outline: 2px solid var(--copper); outline-offset: 3px; }
+.tool.lab-back { font-family: var(--f-doc); background: var(--paper); color: var(--paper-ink); border-color: var(--paper-line); }
+
+/* carga y portada */
+#carga { position: absolute; inset: 0; z-index: 40; display: grid; place-items: center; background: var(--paper); transition: opacity .6s; padding: 16px; }
+#carga.fuera { opacity: 0; pointer-events: none; }
+#carga[hidden] { display: none; }
+#carga .caja { width: min(420px, 100%); display: grid; gap: 10px; }
+#carga h1 { margin: 0; font: 600 30px/1 var(--f-disp); letter-spacing: .16em; color: var(--paper-ink); }
+#carga .pista { height: 6px; border: 1px solid var(--paper-line); background: var(--paper-2); }
+#cargaBar { height: 100%; width: 0; background: var(--paper-ink); transition: width .25s; }
+#cargaTxt { margin: 0; font: 400 13px var(--f-doc); color: var(--paper-ink2); min-height: 1.3em; }
+#carga.error #cargaTxt { color: var(--stamp); }
+#portada { position: absolute; inset: 0; z-index: 30; display: grid; place-items: center; padding: 16px; background: radial-gradient(90% 80% at 50% 50%, rgba(236,228,209,.45), rgba(236,228,209,.86)); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #portada { background: radial-gradient(90% 80% at 50% 50%, rgba(34,32,28,.35), rgba(34,32,28,.88)); } }
+:root[data-theme="dark"] #portada { background: radial-gradient(90% 80% at 50% 50%, rgba(34,32,28,.35), rgba(34,32,28,.88)); }
+#portada[hidden] { display: none; }
+.cubierta { position: relative; width: min(560px, 100%); background: var(--paper); border: 1px solid var(--paper-line); box-shadow: 0 24px 70px rgba(0,0,0,.35); padding: 34px 32px 30px; color: var(--paper-ink); }
+.cubierta::before { content: ''; position: absolute; inset: 8px; border: 1px solid var(--paper-line); pointer-events: none; }
+.cubierta h1 { margin: 14px 0 6px; font: 600 clamp(40px, 9vw, 64px)/.95 var(--f-disp); letter-spacing: .12em; text-transform: uppercase; }
+.cubierta .sub { margin: 0 0 26px; font: 400 16px/1.3 var(--f-doc); color: var(--paper-ink2); }
+.cubierta .sello { position: absolute; right: 26px; top: 26px; }
+#btnIniciar { position: relative; font: 600 20px/1 var(--f-disp); letter-spacing: .14em; text-transform: uppercase; background: var(--paper-ink); color: var(--paper); border: 0; border-radius: 2px; padding: 16px 26px; cursor: pointer; min-width: min(240px, 100%); }
+#btnIniciar:disabled { opacity: .5; cursor: progress; }
+.cubierta .nota { margin: 18px 0 0; font: 400 13px/1.4 var(--f-doc); color: var(--paper-ink2); }
+
+/* laboratorio: dos zonas */
+#labUI { position: absolute; left: 16px; top: calc(14px + env(safe-area-inset-top, 0px)); z-index: 8; max-width: min(380px, calc(100% - 32px)); background: var(--paper); border: 1px solid var(--paper-line); padding: 10px 14px 11px; color: var(--paper-ink); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+#labUI h2 { margin: 3px 0 2px; font: 600 21px/1.1 var(--f-disp); letter-spacing: .1em; text-transform: uppercase; }
+#labUI p.t { margin: 0; font: 400 13px/1.4 var(--f-doc); color: var(--paper-ink2); }
+#labUI[hidden], #ofiUI[hidden] { display: none; }
+.zona { position: absolute; left: 0; top: 0; z-index: 7; display: none; text-align: left; padding: 8px 13px 9px; background: var(--paper); color: var(--paper-ink); border: 1px solid var(--paper-line); border-radius: 2px; box-shadow: 0 8px 22px rgba(0,0,0,.35); cursor: pointer; transition: background .2s, box-shadow .2s; }
+#app.modo-laboratorio .zona { display: grid; gap: 3px; }
+.zona::after { content: ''; position: absolute; left: 50%; top: 100%; width: 1px; height: 8px; background: var(--paper-line); }
+.zona .zt { font: 600 19px/1 var(--f-disp); letter-spacing: .1em; text-transform: uppercase; }
+.zona .zs { font: 400 12.5px/1.2 var(--f-doc); color: var(--paper-ink2); }
+.zona.on { background: var(--paper-2); box-shadow: 0 0 0 2px var(--copper), 0 10px 26px rgba(0,0,0,.4); }
+
+/* oficina */
+#ofiUI { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
+#ofiUI > * { pointer-events: auto; }
+.ofi-h { position: absolute; pointer-events: auto; left: 16px; top: calc(14px + env(safe-area-inset-top, 0px)); display: flex; gap: 10px; align-items: flex-start; max-width: calc(100% - 32px); }
+.ofi-h .doc-card { background: var(--paper); border: 1px solid var(--paper-line); padding: 7px 12px 8px; color: var(--paper-ink); box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+.ofi-h h2 { margin: 2px 0 0; font: 600 19px/1.1 var(--f-disp); letter-spacing: .1em; text-transform: uppercase; }
+#papeles { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: min(1040px, calc(100% - 32px)); display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px; }
+#papeles button { display: grid; gap: 2px; text-align: left; background: var(--paper); color: var(--paper-ink); border: 1px solid var(--paper-line); border-radius: 2px; padding: 7px 9px 8px; cursor: pointer; box-shadow: 0 6px 16px rgba(0,0,0,.25); min-height: 44px; }
+#papeles button:hover { background: var(--paper-2); }
+#papeles .pn { font: 400 12px var(--f-doc); color: var(--stamp); letter-spacing: .06em; }
+#papeles .pt { font: 400 12.5px/1.2 var(--f-doc); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#papelTip { position: absolute; left: 0; top: 0; z-index: 7; pointer-events: none; font: 400 15px/1.2 var(--f-doc); color: var(--paper-ink); background: var(--paper); border: 1px solid var(--paper-line); padding: 6px 10px; box-shadow: 0 6px 18px rgba(0,0,0,.35); white-space: nowrap; }
+#papelTip[hidden] { display: none; }
+
+/* dossier de la gráfica */
+#dossier { position: absolute; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; background: var(--shade); padding: 34px 22px 22px; }
+#dossier.open { display: flex; }
+.dos { position: relative; width: min(1180px, 100%); height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--paper); color: var(--paper-ink); border: 1px solid var(--paper-line); box-shadow: 0 30px 80px rgba(0,0,0,.5); animation: aparecer .35s both; }
+.dos::before { content: 'EXPEDIENTE'; position: absolute; left: 22px; top: -25px; height: 25px; box-sizing: border-box; padding: 6px 14px 0; font: 400 11px var(--f-doc); letter-spacing: .14em; color: var(--paper-ink2); background: var(--paper); border: 1px solid var(--paper-line); border-bottom: 0; }
+.dos-h { position: static; pointer-events: auto; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 14px 20px 10px; border-bottom: 1px dashed var(--paper-line); }
+.dos-h h2 { margin: 4px 0 2px; font: 600 26px/1.05 var(--f-disp); letter-spacing: .08em; text-transform: uppercase; }
+.dos-sub { margin: 0; font: 400 13px/1.35 var(--f-doc); color: var(--paper-ink2); }
+.dos-meta { display: flex; align-items: center; gap: 16px; flex: none; }
+.dos-num { font: 400 20px var(--f-doc); letter-spacing: .06em; }
+.dos-body { min-height: 0; background: var(--paper-2); }
+#dosFrame { display: block; width: 100%; height: 100%; border: 0; background: var(--paper-2); }
+.dos-f { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 10px 20px 12px; border-top: 1px dashed var(--paper-line); }
+.dos-f .sp { flex: 1; }
+@media (max-width: 820px) {
+  #papeles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+  #papeles button { padding: 5px 7px 6px; } #papeles .pt { font-size: 11.5px; }
+}
+@media (max-width: 640px) {
+  #dossier { padding: 0; }
+  .dos { border: 0; } .dos::before { display: none; }
+  .dos-h { padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 8px; } .dos-h h2 { font-size: 21px; } .dos-h .sello { display: none; }
+  .dos-f { display: grid; grid-template-columns: 1fr 1fr; padding: 8px 14px calc(10px + env(safe-area-inset-bottom, 0px)); } .dos-f .sp { display: none; }
+  #dosBack { grid-column: 1 / -1; order: 3; }
+  .cubierta { padding: 28px 22px 24px; } .cubierta .sello { right: 16px; top: 16px; font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #app.modo-reactor > header, #app.modo-reactor > #info, .dos { animation: none; }
+  #carga, #cargaBar { transition: none; }
+}
 </style>
 
 <div id="app">
@@ -99,6 +198,7 @@ header > * { pointer-events: auto; }
     <div class="row1">
       <div class="brand"><h1>RESONADOR Ω</h1><p>Proyecto Ω · Instituto Kurchátov · modelo 3D modular</p></div>
       <div class="tools">
+        <button class="tool lab-back" id="btnLab" type="button" title="Volver al laboratorio (Esc)">← Laboratorio</button>
         <button class="tool" id="btnPanel" type="button" aria-pressed="false">Componentes</button>
         <button class="tool" id="btnLabels" type="button" aria-pressed="true">Etiquetas</button>
         <button class="tool" id="btnScale" type="button" aria-pressed="true">Escala</button>
@@ -125,13 +225,74 @@ header > * { pointer-events: auto; }
     </div>
   </aside>
   <div id="toast" hidden role="status"></div>
+  <!-- ===== experiencia ===== -->
+  <section id="labUI" hidden aria-labelledby="labT">
+    <p class="kick">Proyecto Ω · Instituto Kurchátov</p>
+    <h2 id="labT">Laboratorio</h2>
+    <p class="t">Elige una zona: el reactor o la oficina de análisis.</p>
+  </section>
+  <button type="button" class="zona" id="zReactor" aria-label="Ir al reactor Ω"><span class="zt">Reactor Ω</span><span class="zs">Ir al reactor →</span></button>
+  <button type="button" class="zona" id="zOficina" aria-label="Ir a la oficina de análisis"><span class="zt">Oficina de análisis</span><span class="zs">Ir a la oficina →</span></button>
+  <section id="ofiUI" hidden aria-labelledby="ofiT">
+    <div class="ofi-h">
+      <button type="button" class="doc-btn" id="ofiBack" title="Volver al laboratorio (Esc)">← Laboratorio</button>
+      <div class="doc-card"><p class="kick">Archivo de gráficas</p><h2 id="ofiT">Oficina de análisis</h2></div>
+    </div>
+    <nav id="papeles" aria-label="Papeles del escritorio: una gráfica por papel"></nav>
+  </section>
+  <div id="papelTip" hidden aria-hidden="true"></div>
+  <div id="dossier" role="dialog" aria-modal="true" aria-labelledby="dosTitle" hidden>
+    <article class="dos">
+      <header class="dos-h">
+        <div><p class="kick">Archivo · Instituto Kurchátov · Proyecto Ω</p><h2 id="dosTitle"></h2><p class="dos-sub" id="dosSub"></p></div>
+        <div class="dos-meta"><span class="dos-num" id="dosNum"></span><span class="sello" aria-hidden="true">ARCHIVO</span></div>
+      </header>
+      <div class="dos-body"><iframe id="dosFrame" title="Gráfica"></iframe></div>
+      <footer class="dos-f">
+        <button type="button" class="doc-btn" id="dosBack">← Volver al escritorio</button>
+        <span class="sp"></span>
+        <button type="button" class="doc-btn" id="dosPrev">← Anterior</button>
+        <button type="button" class="doc-btn" id="dosNext">Siguiente →</button>
+        <a class="doc-btn" id="dosSolo" href="#" target="_blank" rel="noopener" aria-label="Abrir la gráfica sola en una pestaña nueva">Abrir sola ↗</a>
+      </footer>
+    </article>
+  </div>
+  <section id="portada" hidden aria-labelledby="portT">
+    <div class="cubierta">
+      <p class="kick">Archivo del instituto · Visor 3D</p>
+      <span class="sello" aria-hidden="true">ARCHIVO</span>
+      <h1 id="portT">Resonador Ω</h1>
+      <p class="sub">Proyecto Ω · Instituto Kurchátov</p>
+      <button type="button" id="btnIniciar" disabled>Iniciar experiencia</button>
+      <p class="nota">Recorre el laboratorio: el reactor y la oficina de análisis.</p>
+    </div>
+  </section>
+  <div id="carga" role="progressbar" aria-label="Cargando la escena" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div class="caja"><p class="kick">Proyecto Ω · Instituto Kurchátov</p><h1>RESONADOR Ω</h1><div class="pista"><div id="cargaBar"></div></div><p id="cargaTxt">Cargando Three.js…</p></div>
+  </div>
+  <p id="vivo" class="sr" aria-live="polite"></p>
 </div>
+<script type="application/json" id="graficas-datos">/*GRAFICAS_JSON*/</script>
+
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script>window.RES_EXTERNAL = true;</script>
 <script>
 /*MODEL*/
 </script>
 <script>
 /*APP*/
 document.getElementById('btnPanel').addEventListener('click', function () { document.getElementById('app').classList.toggle('pan'); });
+</script>
+<script>
+/*LAB*/
+</script>
+<script>
+/*OFICINA*/
+</script>
+<script>
+/*GRAFICA*/
+</script>
+<script>
+/*EXPERIENCIA*/
 </script>
